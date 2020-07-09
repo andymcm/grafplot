@@ -1,0 +1,35 @@
+TESTING
+
+This section documents the tests which were carried out on the program, to prove that it meets with the requirements set out when the system was designed.
+
+The tests follow very closely the test plan which was devised during the design. In fact, the separate sub-sections used in the test plan are used again here. 
+
+For each sub-section, a table with three columns has been produced. 
+
+The first column is simply the number of the test. This can be used to identify the test in the test plan. 
+
+The second is a comment on the test. For many tests, this is left blank. This simply means that the test worked as documented in the test plan.
+
+The third is a reference number for any evidence given. In most cases, this evidence is in the form of a screen dump of the program in action. However, for some tests, a screen dump is not appropriate, and therefore no evidence is provided.
+
+Finally, after all the tables and screen dumps, a note on compatibility is given, followed by a summary of the success of the testing.
+COMPATIBILITY
+
+To check the compatibility of the software, it was tested on the Nimbus system discussed in the design.
+
+All the tests proved positive. 
+
+The screen display worked perfectly on both EGA and VGA settings, as did the mouse.
+
+The file-handling functions coped with the hard disk equally well, and the only bearing the 80286 processor had on the software was to speed it up, as expected.
+
+The printouts produced by the EPSON LQ-850 were identical to those produced by the STAR, as they should be. One of these printouts, by means of evidence, is given overleaf.
+
+Finally, the system was tested using a STAR LC-10C 9-pin printer, which worked as expected. The results of these tests were given earlier.
+
+
+SUMMARY
+
+All in all, the software could not have responded more favourably to the tests applied to it. 
+
+The system is now without doubt fully operational.

@@ -1,0 +1,2314 @@
+SYSTEM MAINTENANCE
+
+
+This section describes in detail the source code for the program.
+
+First of all, the important information in the header block is given. This includes the definitions of both the symbols and the global variables used in the program. A complete listing of the block is also reproduced for reference.
+
+Each separate 'C' function is then given, with both a general description and an annotated listing, which together should clarify the operation of the code.
+
+For each function, there are a few different sections which go to make up its description.
+
+First of all, the function definition is given. This is exactly as it appears in the source code, and is listed as both a title to each function, and also as a reference to the parameters and type of return value which the function uses.
+
+The second section is a description in plain English of what each function does, and how it does it.
+
+The third section lists the parameters that are passed to the function, and their purpose.
+
+The fourth section details the possible values that the return value of the function may take, and what these values signify to the calling function.
+
+Finally, a list of the local variables and their purpose are given. In most cases, the variable name has been chosen to try and convey its meaning, but the English description is added to further clarify matters.
+
+In addition to the description of each function, a few diagrams are included to try to demonstrate how the various function interact with each other. To further aid this process, the functions are grouped into sections which should help to show the flow of data around the system.
+
+However, before the description of the code, the diagram overleaf represents the entire system as a data flow diagram.
+GLOBAL VARIABLES AND SYMBOLS	
+
+I will begin the description of the source code by detailing the global variables and symbols used in the program. 
+
+These are contained in the header block of the program, which is given in full at the end of this sub-section.
+
+
+Symbols :
+
+Each symbol is listed, along with the value it represents. 
+
+	NO        0	)
+	YES		1	)	Usually used as return values.
+	ERROR	2	)
+
+	ALL       0	)
+	XYAXES	1	)	Used in denoting which parameters
+	FORMULA	2	)	of the graph the user wishes to 
+	XAXIS	3	)	change.
+	YAXIS	4	)
+	
+	FUNCTIONS 14		Number of mathematical functions
+	PI		3.14159265358979323846
+
+
+These symbols are defined in the header block, using the '#define' compiler directive.
+Global variables :
+
+
+ long int xratio, yratio
+
+ My program supports both EGA and VGA screen adaptors. This is
+ achieved by using device-independent coordinates. What this
+ simply means is that any coordinates used in graphics 
+ functions, e.g. 'moveto' or 'lineto', are chosen from a 
+ 640x480 template. These template coordinates are then 
+ converted to either EGA or VGA screen coordinates by 
+ multiplying them by these two variables.
+
+ For example, suppose the program is running in EGA mode. The 
+ variable 'xratio' will have been set to 640 (the number of
+ horizontal pixels in EGA) and 'yratio' to 350 (the number of
+ vertical pixels in EGA).
+
+ However, the program treats the screen as if it has a 
+ resolution of 640x480, no matter what its real resolution is.
+ So, to reference the bottom right corner, it would use the
+ coordinate (639,479). But this is obviously not correct for 
+ the EGA screen, which would be (639,349). So the coordinates 
+ used by the program would actually be (639*xratio/640, 
+ 479*yratio/480), which gives (639,349), if xratio and yratio 
+ are 640 and 350 respectively. If xratio and yratio are 
+ changed to 640 and 480, as for a VGA screen, then the 
+ coordinates above become 639 and 479, i.e. the correct 
+ coordinates for the VGA display.
+ The great advantage with this system is that if a better 
+ graphics standard comes along, it can be incorporated with 
+ ease. All that needs to be changed is the values of xratio 
+ and yratio at the start of the program. Thus, if a new 
+ adaptor boasting a resolution of 1024x768 became available, 
+ setting xratio and yratio to 1024 and 768 respectively at the 
+ start of the program would be enough to alter every 
+ coordinate in the program.
+
+ Study of the source code make this system easier to 
+ understand.
+
+
+ unsigned char original_formula[100]
+
+ Character array in which to store the formula, as typed in by 
+ the user.
+
+
+ double minimum_x, division_x, minimum_y, division_y
+
+ These variables are simply used to store the minimum x- and 
+ y-coordinates of the graph to be drawn, and the size of each
+ of the five divisions on the axes. 
+
+ Thus, the maximum x- and y-coordinates are defined as
+ 'minimum_x+5*division_x'  and  'minimum_y+5*division_y'   
+ respectively.
+
+ struct formula_table
+ {
+	int operator;
+	int leftvalue;
+     int rightvalue;
+ }f_table[100]
+
+ This structure forms the table discussed at length in the 
+ design section and later on in this section. It represents 
+ the formula split into small steps.
+
+
+ char function_table[FUNCTIONS][6]
+
+ This two-dimentional array contains the names of all the 
+ valid mathematical functions (sin, cos, log etc.) used by the 
+ parser. Each function's code (128+) is defined by its 
+ position in this table. 
+
+
+ double numbers_table[100]
+
+ Used when translating the formula, to store the numbers in 
+ the formula which have been encoded.
+
+ double f_t_values[100]
+
+ Used to store the value of each line in 'formula_table', as 
+ they are calculated.
+ int f_t_pointer
+
+ Stores the current position, i.e. the line number, in the 
+ formula table.
+
+ char *sub_string_store
+
+ Used by the 'sub_string' function to store the result of the
+ operation it performs.
+
+ int speed
+
+ The current speed, which is a value between one and ten. 
+ Default value is five.
+
+ int point_defined_flag
+ 
+ Takes the value YES or NO. Indicates whether or not the point
+ currently trying to be plotted is valid. For example, if a 
+ divide by zero was being attempted at a certain point, this
+ flag would be set to NO.
+
+ int radians_flag
+
+ Takes the value YES or NO. If YES, the current graph will be 
+ drawn using radian angle measure. If NO, the graph will be 
+ drawn using degree angle measure. Default value is NO.
+
+  int grid_flag
+
+ Takes the value YES or NO. If YES, the current graph will be
+ drawn with a grid. If NO, the graph will be drawn on a plain
+ background. Default value is YES.
+
+ int mouse_installed
+
+ Takes the value YES or NO. Indicates whether there is a mouse
+ present in the system.
+
+ double coordinate_stack[20][4]
+
+ Array of double precision floating point numbers which is 
+ used to store the coordinates of a graph when a zoom 
+ operation takes place. Accessed as a stack.
+
+ int coordinate_stack_pointer
+
+ Pointer used to implement the stack structure of the
+ 'coordinate_stack' array.
+
+ int data_saved_flag
+
+ Takes the value YES or NO. Indicates whether or not the
+ data currently in memory has been saved to disk or not.
+ 
+The operation and purpose of each of these global variables will become apparent as the functions are individually explained.
+
+To round off this section, I will give the listing of the header block of the program. 
+
+This includes the symbols and global variables described above. It also shows the standard TURBO C '#include' files which I have used.  These '#include' files contain function definitions for the library functions which the program uses, e.g. 'printf'.
+
+The rest of the header block is made up of the definitions of the functions which I have written, i.e. the functions which make up the source code. These definitions are used by the compiler for verification purposes, and are exactly the same as those used at the start of each function. They can therefore be ignored unless modification of the return value or parameters of a function is made.
+FUNCTIONS 
+  
+
+'START AND FINISH'
+
+
+The first function which is called when any 'C' program is executed is the 'main' function. In my program, this function is very simple. It has only two commands, each of which are calls to other functions. The first is a call to 'set_up_routine', which sets up the screen display for the program, and the second is a call to 'menu_system', which, as the name suggests, sets the menu system in motion. This initial automatic execution of the 'main' function is the only time that it is ever called, and the function is never returned to.
+
+The last function which is called is the 'end' function. Obviously, this function terminates the program. It does this by closing down the graphics system using a call to the library function 'closegraph', and finally calling another library function, 'exit', which causes the program to terminate and the user to be put back to the DOS prompt.
+
+Neither of the functions described above have any parameters, return values, or local variables. 
+
+The source code for the functions is shown overleaf.
+SET-UP FUNCTIONS
+
+These simple functions ask the user which type of screen display he would like to use, and set up the screen accordingly.
+
+FUNCTION DEFINITION :
+
+	set_up_routine()
+
+DESCRIPTION :
+
+This function consists of calls to four other functions.
+
+The function 'ask_for_display' is called, and its return value used as the parameter for the 'set_up_display' function. 
+The 'menu_headings' function is then called, followed by the 'initialise_mouse' function.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+	None.
+FUNCTION DEFINITION :
+
+	int ask_for_display()
+
+DESCRIPTION :
+
+This function asks the user which type of display he wishes to use, either EGA or VGA.
+
+When the user has either pressed the 'E' or 'V' key as appropriate, the global variables for the screen template are set up depending on the resolution of the screen display. 
+
+PARAMETERS :
+
+	None
+
+RETURN VALUE :
+
+The return value is either EGA or VGA. These are symbolic references, defined in the 'graphics' include file, and represent their respective display types.
+
+LOCAL VARIABLES :
+
+ char adaptor
+
+ Stores the ascii code representing the key pressed by the
+ user.
+FUNCTION DEFINITION :
+
+	set_up_display( int graph_driver )
+
+DESCRIPTION :
+
+This function actually switches to the graphics mode chosen by the user, and then clears the screen to light blue.
+
+PARAMETERS :
+
+ int graph_driver
+
+ Takes the value EGA or VGA, depending on which was chosen by 
+ the user in the 'ask_for_display' function.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int graph_mode
+
+ Used when switching to graphics mode. Takes the value EGAHI 
+ or VGAHI, and represents the mode with the highest resolution 
+ for each of the respective adaptors.
+FUNCTION DEFINITION :
+
+	menu_headings()
+
+DESCRIPTION :
+
+This function displays the menu headings at the top of the screen.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+	None.
+MENU SYSTEM
+
+
+The menu system that I have implemented is, more or less, as described in the 'Design' section. It is a pop-up type, where a menu heading is chosen, by using either the mouse or the keyboard, and the appropriate menu then appears on-screen, from which the user can pick the option he requires, again either by keyboard or mouse. 
+
+A diagram giving a basic outline of how the menu system works is given overleaf. It shows how each of the functions associated with the menu system interact to produce the professional, user-friendly interface which was requested in the analysis.
+
+Each of the functions which go to make up the menu system are then described in detail. There is the 'menu_system' function itself. This is the core function of the whole program. It calls the 'wait_for_input' function, which in turn calls the individual menu functions such as 'FILEmenu' and 'GRAPHmenu'. These functions then call the 'display_menu' function (the function that actually displays the menu), the return value from which tells the functions which option the user has chosen, and thus indicates which further function needs to be called. All of this is summarised effectively by the diagram.
+FUNCTION DEFINITION :
+
+	menu_system()
+
+DESCRIPTION :
+
+This is the core function of the menu system, and indeed of the whole program. It is in fact a very simple one. It uses a 'while' statement to keep calling the 'wait_for_input' function until the user decides to quit. This condition (the user quitting) is indicated by the return value of the 'wait_for_input' function being zero. When this happens, the 'while' statement is no longer evaluated, and thus the next instruction, the call to 'end', is executed. The program is thus terminated.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+	None.
+FUNCTION DEFINITION :
+
+	int wait_for_input()
+
+DESCRIPTION :
+
+This is the function which detects the user's choice of menu. It waits for either a key or the mouse button to be pressed. 
+
+If a key is pressed, the function decides whether or not the key is one which selects a menu. If not, the function simply keeps waiting. 
+
+If the mouse button is pressed, the function decides whether or not the mouse pointer was over a menu heading at the time. If it was not, again the function keeps waiting. 
+
+When either a valid key is pressed or the mouse button is pressed when it is over a menu heading, the function calls the appropriate individual menu routine. For example, if the 'FILE' menu is selected, either by the mouse or the key-combination CTRL-F, the function 'FILEmenu' is called.
+
+
+PARAMETERS : 
+
+	None.
+
+RETURN VALUE :
+
+If any menu function other than the 'QUITmenu' function was called, the return value is always 'YES'. If the 'QUITmenu' function is called, the return value from it is used to determine the return value for the 'wait_for_input' function. If the return value from 'QUITmenu' is 'YES', i.e. the user does want to quit, then the 'wait_for_input' function returns 'NO', causing the 'end' function to be invoked in the 'menu_system' function. If the return value from 'QUITmenu' is 'NO', i.e. the user does not want to quit, 'wait_for_input' returns 'YES', and the program therefore does not terminate.
+
+LOCAL VARIABLES :
+
+ int key_test
+
+ Stores the ascii code for the key which the user presses to 
+ select a menu.
+
+ int mouse_test
+
+ Stores the status of the mouse button. If the button has been 
+ pressed, it has the value 'YES', otherwise 'NO'.
+
+ int mouse_x, mouse_y
+
+ Store the x- and y-coordinates of the mouse pointer at the 
+ moment when the mouse button is pressed.
+ int menu_number
+
+ A number between one and six indicating which of the menus 
+ have been selected. The FILE menu is number one, the GRAPH 
+ menu number two etc., up to number six, the QUIT menu.
+
+ int valid_input_flag 
+
+ Flag indicating whether or not the input, either the key 
+ press or the mouse button press, was valid or not. If it 
+ was valid, it is 'YES', otherwise 'NO'.
+
+ union REGS inregs, outregs
+
+ Stores the values of the cpu registers. 'inregs' is used to
+ store the values before the mouse interrupt is called, 
+ 'outregs' the values after.
+FUNCTION DEFINITIONS :
+
+	FILEmenu()
+	GRAPHmenu()
+	PRINTmenu()
+	OPTIONSmenu()
+	ZOOMmenu()
+	QUITmenu()
+
+DESCRIPTION :
+
+These six functions all work using the same principle. 
+
+First of all, the text for the options contained in the menu which has to be drawn is stored in a character array called 'options'. 
+
+This array, along with a set of coordinates used to locate the menu, are passed to the function 'display_menu', which actually draws the menu on-screen. 
+
+The return value from the 'display_menu' function is then used to decide which function to call next. 
+
+For example, let's say that the 'wait_for_input' function had detected that the user had chosen the OPTIONS menu, and had therefore called the 'OPTIONSmenu' function. 
+
+The 'OPTIONSmenu' function would then call the 'display_menu' function, which would display the OPTIONS menu, and return the menu item chosen by the user. Suppose the user chooses the 'Speed' item from the menu. The 'display_menu' function will return the number one, as 'Speed' is the first item on the menu, and the 'OPTIONSmenu' function will use this to decide on which further function to call, in this case the 'Change_speed' function.
+
+This all becomes clear by examining the source code for the functions.
+
+PARAMETERS :
+
+None of the six functions make use of parameters.
+
+RETURN VALUES :
+
+Only the 'QUITmenu' function has a return value. It is either 'YES' or 'NO' indicating that the user either does, or does not want to quit, respectively.
+
+LOCAL VARIABLES :
+
+There are two local variables common to all six functions. These are -
+
+ char *options
+
+ A pointer to a character array containing the menu options.
+ int chosen_option
+
+ A value indicating which of the menu options the user has 
+ chosen, e.g. if the user chooses the third item on the menu,
+ chosen_option takes the values three.
+
+
+'GRAPHmenu' also contains these further local variables -
+
+ double new_minimum_x, new_minimum_y, new_maximum_x, 
+	   new_maximum_y
+
+ Passed to the 'prompt_user_for_input' function, in order to
+ store the user's new values for the minimum and maximum x- 
+ and y-coordinates, when drawing a new graph.
+
+
+'QUITmenu' has one further local variable - 
+
+ int quit_flag
+
+ Indicates whether or not the user wishes to terminate the 
+ program or not. Contains the value 'YES' if the user does
+ want to quit, and 'NO' if he does not.
+FUNCTION DEFINITION :
+
+	int display_menu( int x, int y, char *options, 
+				   int characters_width )
+
+DESCRIPTION :
+
+This is the function which actually displays the menu on the screen. The top left of the menu is located at the coordinates (x,y) as defined in the parameter list. The individual menu items are held in the character array pointed to by 'options'. 
+
+Each menu item has a '@' character embedded in it. For example, an item on the FILE menu is 'Load graph'. This is, in fact, represented in the array by '@Load graph'. This embedded character tells the function which character to highlight when the menu is being displayed. In this case the 'L' will be highlighted. This highlighted character is then stored, and used to compare with the user's input. If the user presses the 'L' key, the function knows that the user has chosen the 'Load graph' option. Obviously, if the user uses the mouse, then this is irrelevant. 
+
+The menu options are printed in blue, with the highlighted character for each item in red.
+
+Similar methods of detecting mouse and keyboard input as those in the 'wait_for_input' function are used.
+
+PARAMETERS :
+
+ int x, y
+
+ Screen coordinates of the top-left corner of the menu.
+
+ char *options
+
+ Pointer to character array containing the menu options.
+
+ int characters_width
+
+ Width of the menu, in characters. A typical width is fifteen
+ characters.
+
+
+RETURN VALUE :
+
+Returns an integer with a value indicating which of the menu items the user has chosen. For example, if the user chooses the third item on the menu, the return value is three. If no option is chosen, e.g. the ESC key is pressed, the return value is -1.
+
+LOCAL VARIABLES :
+
+ int loop
+
+ Used for various loops.
+ int position_counter
+
+ Stores the position in the 'options' array when outputting 
+ the menu options to the screen.
+
+ int position_flag
+
+ Used to correct the position in the options array, to allow
+ for the presence of the embedded character '@'.
+
+ int pixel_height, pixel_width
+
+ The height and width in pixels of the menu about to be drawn.
+
+ int number_of_options
+
+ The number of menu options in the menu about to be drawn.
+
+ int valid_input_flag
+
+ Indicates whether or not the user's input, either by keyboard
+ or mouse, was valid.
+
+ char *graphics_buffer
+
+ Pointer to array for storing sections of screen memory.
+
+  char option_key[30]
+
+ Array used to store the menu item keys as indicated by the 
+ embedded characters.
+
+ int mouse_x, mouse_y
+
+ The x- and y-coordinates of the mouse pointer at the moment
+ the mouse button is pressed.
+
+ int key_test
+
+ Stores the ascii code for the key which the user presses to 
+ select a menu.
+
+ int mouse_test
+
+ Stores the status of the mouse button. If the button has been 
+ pressed, it has the value 'YES', otherwise 'NO'.
+
+ int return_value
+
+ The value returned by the function.
+
+ union REGS inregs, outregs.
+
+ Used to manipulate the cpu registers.
+The menu functions just described are the ones involved with actually presenting the user with the menu of his choice, and detecting which option he picks from that menu. The functions detailed now are the ones which actually perform the operations which the user is trying to ask for. The routines associated with the FILE, PRINT, OPTIONS, and ZOOM menus are  described first. There are no functions associated with the QUIT menu.
+
+The GRAPH menu is left out in this section, as it involves a disproportionately large number of functions, and I have therefore decided to devote a whole section to its workings. 
+
+I will start with the file-handling functions, i.e. those associated with the FILE menu.
+
+FUNCTION DEFINITION :
+
+	loadgraph()
+
+DESCRIPTION :
+
+This is the function called by the 'FILEmenu' function, when the 'display_menu' function has returned a value of one, i.e. the user has chosen the 'Load graph' option from the FILE menu.
+
+It first of all looks to see if there is a formula currently in memory. If there is, a message is displayed, warning the user that if a graph is loaded, the current data will be lost.
+
+If the user still wishes to load a graph, or if there is no data in memory, the function prompts the user for the name of the file to be loaded.
+
+The function then tries to open the file. If this is not possible, an error message is produced. Otherwise the file is opened, and the data read in, including the hash total. The function then calls the 'hash_total' function which calculates what the hash total should be, and compares it to the hash total it loaded in from disk. If the two match, a call to 'translate_formula' is used to translate the formula, and a call to 'draw_graph' displays the graph on-screen. If the two do not match, the user is told that the requested file cannot be loaded.
+
+Finally, the file is closed.
+
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+LOCAL VARIABLES :
+
+ int x1, y1, x2, y2
+
+ Screen coordinates of windows in which messages to the user 
+ are issued.
+
+ int hash
+
+ Stores hash total which is loaded in from disk.
+
+ FILE *file_pointer
+
+ Pointer to start of file which is read in from disk.
+
+ char *graphics_buffer
+
+ Pointer to array for storing sections of screen memory.
+
+ char formula_store[150]
+
+ Used to store a copy of the formula, which is passed to the
+ 'translate_formula' function. If the original formula was
+ passed to this function, it would be destroyed.
+
+ char dummy_error_message[50]
+
+ Storage area passed to 'translate_formula' function, in 
+ which to store any error message produced by that function.
+ (Should never be used, as formula on disk should be valid) FUNCTION DEFINITION :
+
+	save_graph( int ask_for_file_name )
+
+DESCRIPTION :
+
+This is the function called by the 'FILEmenu' function, when the 'display_menu' function has returned a value of two or three, i.e. the user has chosen the 'Save' or 'Save as...' options from the FILE menu.
+
+If the user has chosen the 'Save' option, the 'ask_for_file_name' parameter takes the value 'NO'. If the user has chosen the 'Save as...' option, the parameter is 'YES'.
+
+The first thing that the function does is to check that there is any data to save. If there is not, an error message is displayed. 
+
+Next, the function checks the 'file_name' global variable to see if any previous file names have been used. If no previous file name has been used, i.e. no load or save operations have taken place since the program has been running, the 'ask_for_file_name' parameter becomes 'YES', whether or not it was 'YES' when the function was called. This simply means that if the 'Save' option is chosen by the user, and the function does not know what file name to save it under, the rest of the function simply operates as if the 'Save as...' option had been invoked.
+The 'summarise_data' function is then called. This simply displays on-screen the formula, and the minimum and maximum x- and y-coordinates of the graph.
+
+The next part of the function depends on the 'ask_for_file_name' parameter. If it is 'YES', the user is asked for the name under which to save the file. If it is 'NO', the user is simply asked to verify that he wishes to save the file under the last used file name, which is displayed on screen.
+
+In the first case, if the user presses the <return> key without typing a file name, or if, in the second case, he replies 'No', the function simply returns to the 'FILEmenu' function.
+
+If the user still wishes to save the graph, and he has picked the 'Save as...' option, the function then looks on the disk for the file name which the user has specified. If the file already exists, the user is warned that he will overwrite the file on-disk if he continues, and given the option to terminate the process before saving.
+
+Assuming that the user still wishes to save the file, the function then attempts to write the file to disk. If it cannot, e.g. an invalid file name has been specified, an error message is produced. Otherwise, all the parameters associated with the graph are saved, and a message is produced telling the user that the graph has been saved successfully.
+PARAMETERS :
+
+ int ask_for_file_name
+
+ Flag indicating whether the user has chosen the 'Save' option 
+ or the 'Save as...' option. If he has chosen the former, the 
+ parameter takes the value 'NO', otherwise it is 'YES'.
+
+RETURN VALUE :
+
+	None
+
+LOCAL VARIABLES :
+
+ char *graphics_buffer_one, *graphics_buffer_two
+
+ Pointers to arrays for storing sections of screen memory.
+
+ int x1, y1, x2, y2
+
+ Screen coordinates of windows in which messages to the user 
+ are produced.
+
+ char text_store[50]
+
+ Used to store text for messages to the user.
+
+  int write_flag
+
+ Flag to indicate whether or not the user still wishes 
+ to save the file to disk.
+
+ FILE *file_pointer
+
+ Pointer to start of file which is written to disk.
+
+ unsigned int hash
+
+ Used to store hash total calculated from 'hash_total'  
+ function, which is saved to disk after the other 
+ parameters.
+FUNCTION DEFINITION :
+
+	char *summarise_data()
+
+DESCRIPTION :
+
+This function simply displays on-screen the parameters of the graph currently held in memory. It is called by the 'save_graph' function. These parameters simply consist of the formula of the graph, and the minimum and maximum x- and y- coordinates.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+The return value is a pointer to an array holding the area of the screen which is overwritten by this function, so that the calling function can rewrite this area before it finishes.
+
+LOCAL VARIABLES :
+
+ char *graphics_buffer
+
+ Pointer to array for storing sections of screen memory.
+
+  int x1, y1, x2, y2
+
+ Screen coordinates of windows in which messages to the user 
+ are issued.
+
+ char text_store[100]
+
+ Storage area for text to be outputted to the screen.
+FUNCTION DEFINITION :
+
+	unsigned int hash_total()
+
+DESCRIPTION :
+
+This function calculates a hash total for the graph parameters which are currently held in memory. The method of calculation is fairly crude, but it is nonetheless an extremely reliable method of validation.
+
+The total is counted by adding together the value of each individual byte of the parameters of the graph. For the formula, this is straightforward, as it is held in a character array, where each character is one byte. The individual bytes are therefore easy to get at, and can be accessed by simply using array subscripts. Similarly, the 'grid_flag', 'radians_flag', and 'speed' parameters are all values less than the size of one byte (less than 255), and can therefore easily be converted to byte size, even though they are stored in integers which are two bytes long.
+
+The only problem is with the coordinates. These are stored in double-precision floating-point variables, each eight bytes long, and therefore cannot be simply converted into byte values. The way round this is to use character pointers to point to each individual byte within the eight byte variables, and thus access the value of each of the eight bytes separately. 
+Thus the eight byte double-precision variables are treated like eight byte character arrays. This is where the flexibility of the low-level nature of 'C' proves very useful.
+
+With the formula, the coordinates, and the other parameters, there are a total of 135 bytes to be counted (100 for the formula, 32 for the four coordinate values, and three for the other three parameters). This means that there is a maximum total of 135x255=34,425. This is well within the boundaries of the integer variable which is used to store the value.
+
+When the total is calculated, it is returned to the function which called 'hash_total'
+
+PARAMETERS :
+
+	None
+
+RETURN VALUE :
+
+The return value is the hash total.
+
+LOCAL VARIABLES :
+
+ unsigned int total
+
+ The hash total.
+
+  int loop
+
+ Self_explanatory.
+
+ char *xmin_ptr, *ymin_ptr, *xdiv_ptr, *ydiv_ptr
+
+ Used to point to individual bytes within eight-byte double-
+ precision coordinate variables.
+
+
+This completes the file handling functions.
+I will now consider the functions called by the 'PRINTmenu' function. 
+
+There are two types of printout produced by my system. The first is for a 24-pin printer, the second for a 9-pin one. Both use EPSON codes, and should therefore work with any printer which is EPSON compatible. (Practically any dot-matrix printer currently available)
+
+The method of producing both types is essentially the same, except that the printer codes are slightly different. The method used is simply to copy the screen memory, pixel for pixel, on to the paper. Unfortunately, there are two problems with this system. First of all, the 24-pin printer works at much higher resolution than the screen, so if one pixel were translated into one dot on the printer, the resulting output would be much too small. The way that I have counteracted this is to represent each pixel by a matrix of dots. 
+
+The 24-pin printer works at 360 dpi (dots per inch) and the matrix is 2x4, i.e. two dots down by four dots across. This means that a VGA screen, which is 640 pixels across by 480 pixels down, translates into a printout of 2560 dots across and 960 dots down.
+
+There is no problem for the 9-pin version, as it works at 
+90 dpi, just the right resolution to give a one-to-one mapping from screen to printer. 
+
+In fact, the 24-pin printer can be made to run at this resolution as well, but it would be a pity not to utilise the higher capability of the 24-pin printer to achieve better quality results.
+
+The second problem is to convert the colour screen into a monochromatic image on paper. This is achieved in the function by mapping the colours black, magenta, blue, and dark grey to black on the printer, and anything else to white.
+
+Finally, there is a little idiosyncrasy in the printer routine because of the method of producing the codes for output. The screen memory is used to produce the output, and therefore the number of dots plotted in the printout depends on the resolution of the display. As a consequence, because VGA has more pixels vertically than EGA, the printout produced when running the program in VGA mode is slightly longer than that produced when running the program in EGA. This is not an entirely satisfactory situation, and one which I would like to correct, given more time to devise an alternative algorithm for printing. 
+
+However, as both printouts are of excellent quality, there really is no problem, and it could even be argued that this idiosyncrasy gives the VGA user more choice, as he can decide on which graphics mode he will run the program, depending on what size printouts he wants!
+
+
+FUNCTION DEFINITION :
+
+	print_graph( in number_of_pins )
+
+DESCRIPTION :
+
+This is the function which is called when the user chooses either of the two items from the PRINT menu. 
+
+The first thing it does is check that there is a graph in memory which can be printed. If there is not, an error message is produced.
+
+The printer is then initialised, and checked to make sure that it is ready to receive data. If it is not, e.g. it is switched off, an error message is produced.
+
+A message is then displayed where the menu headings usually are, telling the user that printing is in progress, and that the 'Q' key will terminate the process.
+
+A loop then begins which produces the eight-bit codes which will be sent to the printer via the 'print_dots' function.
+
+If the output is for a 24-pin printer, three eight-bit codes are produced on each run through the loop. These three eight-bit codes form a 24-bit column when sent to the printer via the 'print_dots' function, and this column is repeated four times.
+Therefore, each time 'print_dots' is called, i.e. each time through the loop, a matrix of 24x4 dots is produced on the printer. This equates to a matrix of 12x1 pixels on screen. 
+
+The function starts at the top left of the graph and works its way across and down until it reaches the bottom right corner.
+
+If the output is for a 9-pin printer, only one eight-bit code is produced on each run through the loop. This forms an eight-bit column on the printer, which is printed only once. Thus each call to 'print_dots' produces a matrix of 8x1 dots on the printer, and equates to an equal matrix of pixels on-screen.
+
+When the printout is finished, or if the user terminates the process in mid-stream, the menu headings are restored and the function ends.
+
+PARAMETERS :
+
+ int number_of_pins
+
+ The number of pins that the printer possesses. If the user
+ chose the 'Print - 24-pin' option from the PRINT menu, this
+ parameter takes the value 24, and similarly if the user
+ chose the 9-pin option, it takes the value 9.
+
+RETURN VALUE :
+
+	None.
+LOCAL VARIABLES :
+
+ int x, y
+
+ Screen coordinates of pixel currently being printed.
+
+ int dot_one, dot_two, dot_three
+
+ Store codes to be sent to printer via 'print_dots' function.
+
+ int loop, loop_increment
+
+ Loop_increment is the number of pixels which the loop 
+ increments by each time it is run through.
+
+ int pixel
+
+ Colour of pixel currently being encoded.
+
+ int start_y, y_increment
+
+ Screen y-coordinate where printing should start, and the 
+ number of pixels which the 'y' loop increments each time.
+
+ int dot_flag
+
+ Contains either value one or two, depending on whether 24-pin
+ codes or 9-pin codes are being produced. This is because each
+ pixel corresponds to two dots vertically in 24-pin mode, and
+ only one dot vertically in 9-pin mode.
+FUNCTION DEFINITION :
+
+	print_dots( int number_of_pins, int dot_one, int dot_two,
+			  int dot_three )
+
+DESCRIPTION :
+
+This function first sends a couple of codes to the printer, telling it to expect graphics data in either 24-pin or 9-pin mode, depending on the value of the 'number_of_pins' parameter.
+
+If 'number_of_pins' is 24, the codes represented by the other three parameters are sent to the printer four times, thus producing the matrix of 24x4 dots.
+
+If 'number_of_pins' is 9, the code represented by the parameter 'dot_one' is sent to the printer, the other two parameters being ignored. The code is sent only once, thus producing the 8x1 matrix of dots.
+
+PARAMETERS :
+
+ int number_of_pins
+
+ Either 9 or 24, depending on the printer.
+
+  int dot_one, dot_two, dot_three
+
+ Codes prepared in function 'print_graph' which are sent to 
+ printer to produce the representation of the screen. If
+ 'number_of_pins' is 9, only 'dot_one' is used.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int loop
+
+ Self-explanatory.
+I will now consider the functions called by the 'OPTIONSmenu' function.
+
+The OPTIONS menu contains four items. It can be used to change the speed, or to change the unit of angle measure from radians to degrees or vice versa, or to turn the grid on or off, or redraw the graph. 
+
+The final option is used when any of the other options have been used, as they only affect future output, not the graph on-screen at that moment. For example, if the user wishes to see the graph he has just drawn at a slower speed, he must change the speed using the 'Speed' option, and then choose the 'Redraw' option.
+
+
+The only one of the four options described above which requires its own function is the 'Speed' option. The others simply involve the changing of a flag, in the case of the 'Grid on/off' option and the 'Radians/Degrees' option, or the calling of the 'draw_graph' function in the case of the 'Redraw' option. (The 'draw_graph' function is described later)
+
+FUNCTION DEFINITION :
+
+	change_speed()
+
+DESCRIPTION :
+
+This function simply allows the user to change the speed of any subsequent graphs. 
+
+The user is prompted for a value between one and ten. This user input is then checked, first of all that it is a valid number, and second that it is in the required range. If either of these conditions is not fulfilled, the user is requested to try again.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int x1, y1, x2, y2
+
+ Screen coordinates of windows in which messages to the user 
+ are issued.
+ int valid_input_flag
+
+ Indicates whether or not the user has inputted a valid value. 
+ Takes either the value 'YES' or 'NO'.
+
+ char *graphics_buffer
+
+ Pointer to array for storing sections of screen memory.
+
+ char speed_string[3]
+
+ Stores the user input, before it is converted to an integer
+ value.
+I will now consider the functions called by the 'ZOOMmenu' function.
+
+The ZOOM menu contains three items. The 'Zoom in' and 'Zoom out' options each call another function, called 'zoom_in' and 'zoom_out' respectively. The third option, 'Clear', does not need its own function, as it simply resets the 'coordinate_stack_pointer' global variable to zero. This is carried out in the 'ZOOMmenu' function itself.
+
+FUNCTION DEFINITION :
+
+	zoom_in()
+
+DESCRIPTION :
+
+This function allows the user to zoom in on a rectangle area of the screen, which he defines using the mouse.
+
+The first check that is made is that a graph has already been drawn. If not, an error message is produced, and the function terminates.
+
+The mouse is centred, and the function then waits for the mouse button to be pressed. 
+
+When pressed, the function then draws a rectangle from that point to the point where the user 'drags' the mouse to. 
+
+Obviously, this rectangle is being constantly redrawn, as the user moves the mouse. When the user releases the mouse button, the function calculates the real coordinates of the new graph which is to be drawn, and then tests them to make sure that they are valid. 
+
+The stack pointer is then checked to make sure that the user has not zoomed in twenty times. If he has, he is warned that further zooms will not be recorded, although they will be permitted.
+
+If the coordinates are valid, they are pushed on to the coordinate stack which stores the coordinates for future reference.
+
+The new graph is then drawn by a call to 'draw_graph'.
+
+
+PARAMETERS :
+
+	None.
+
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int mouse_test
+
+ Takes the value YES or NO, depending on whether the mouse 
+ button has been pressed or not.
+
+ int corner_flag
+
+ Takes the value 1, 2, 3, or 4, depending on which corner of
+ the rectangle that the user starts to drag the mouse from.
+ If the user presses the mouse button and drags it down and to
+ the right, the value is 1. Similarly, values 2, 3, and 4 
+ indicate that the pointer has been dragged left and up, 
+ left and down, or right and up respectively.
+
+ double left, right, top, bottom
+
+ Screen coordinates of area of display where the original 
+ graph was drawn.
+
+ double mouse_x, mouse_y
+
+ Coordinates of point where mouse button is first pressed.
+
+ double new_mouse_x, new_mouse_y
+
+ Coordinates of point where mouse is dragged to.
+
+ double new_minimum_x, new_minimum_y, new_maximum_x, 
+        new_maximum_y
+
+ Real coordinates of new graph to be drawn, as defined by
+ the rectangle already described.
+
+ double x1, y1, x2, y2
+
+ Screen coordinates of rectangle drawn by user.
+
+ char *graphics_buffer_one, *graphics_buffer_two,
+	 *graphics_buffer_three, *graphics_buffer_three
+
+ Pointers to arrays for storing sections of screen memory.
+
+ union REGS inregs, outregs
+
+ Stores the values of the cpu registers. 'inregs' is used to
+ store the values before the mouse interrupt is called, 
+ 'outregs' the values after.
+FUNCTION DEFINITION :
+
+	zoom_out()
+
+DESCRIPTION :
+
+This function is called when the user chooses the 'Zoom out' option from the ZOOM menu.
+
+It checks first that at least one previous 'zoom in' has taken place. If not, an error message is produced, and the function terminates.
+
+The function then simply pops the last set of coordinates from the coordinate stack, and uses them to produce the new graph via a call to the 'draw_graph' function.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+	None.
+SYSTEM MAINTENANCE (continued)
+
+
+I will now deal with the functions associated with the GRAPH menu. 
+
+These functions are all those which are connected with actually taking the core data (formula, x- and y-axes) and producing a graph.
+
+They can be split into two categories. The first set perform the translation of the formula into tables which were described in the design.
+
+The second set use the tables and the minimum and maximum x- and y-coordinates to actually plot the graph on-screen.
+
+
+However, before either of these sets of functions come into operation, the user must be able to input the information that they process. This is performed by the 'prompt_user_for_data' and associated functions, which are detailed now.
+
+FUNCTION DEFINITION :
+
+	prompt_user_for_data( int data_required, 
+					  double *new_minimum_x, 
+					  double *new_maximum_x,
+					  double *new_minimum_y,
+					  double *new_maximum_y )
+
+DESCRIPTION :
+
+This function is called when any of the options on the GRAPH menu are chosen by the user.
+
+It allows the user to enter either a new formula, a new set of x-axes, a new set of y-axes, a set of both x- and y-axes, or the whole lot, depending on the value of the parameter 'data_required'.
+
+If 'data_required' has the value ALL or FORMULA, i.e. the user has chosen the 'New graph' or 'New formula' options from the GRAPH menu, the user is prompted to enter a formula.
+
+When the formula has been input, via a call to 'text_input', the 'tidy_the_formula' is called. This is a preparation stage before the formula is translated, and is detailed later. The formula is then tested by a call to 'test_the_formula'. If this function finds an error in the formula, the user is asked to re-enter the formula, otherwise the formula is copied and passed to the 'translate_formula' function to be translated. 
+If this function finds an error in the formula which was missed by the 'test_the_formula' function, the user is again asked to re-enter it. If there are no errors in the formula, the function continues.
+
+If 'data_required' has the value ALL or XYAXES or XAXIS, i.e. the user has chosen the 'New graph' or 'New xy-axes' or 'New x-axis' options from the GRAPH menu, the user is prompted to enter a minimum and maximum x-coordinate.
+
+When the two coordinates have been entered, they are passed to the 'check_for_digits' function, which makes sure that they are numbers. The coordinates are then checked to make sure that they are not the same. If either of these tests are failed, the user is asked to re-enter the coordinates.
+
+The numbers are then checked to make sure that the minimum one is smaller than the maximum one. If not, the two values are swapped.
+
+The next check is that they both lie in the range 
++/-99,999,999. Then they are passed to the 'check_for_accuracy' function, which makes sure that the numbers are not more than ten significant figures. Again, if either of these tests are failed, the user is asked to re-enter the coordinates.
+
+If the coordinates pass all the tests, they are accepted, and the function continues.
+If 'data_required' has the value ALL or XYAXES or YAXIS, i.e. the user has chosen the 'New graph' or 'New xy-axes' or 'New y-axis' options from the GRAPH menu, the user is prompted to enter a minimum and maximum y-coordinate.
+
+The tests carried out are the same as those for the 
+x-coordinates.
+
+
+PARAMETERS :
+
+ int data_required
+
+ Takes the value 'ALL', 'FORMULA', 'XYAXES', 'XAXIS', or 
+ 'YAXIS', depending on which option the user picked from the 
+ GRAPH menu.
+
+ double *new_minimum_x, *new_maximum_x, *new_minimum_y, 
+	   *new_maximum_y
+
+ Used to store the values for the minimum and maximum x-
+ and y-coordinates entered by the user.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int x1, x2, formula_y1, x_axis_y1, y_axis_y1, y2
+
+ Screen coordinates for windows where user is prompted for
+ data
+
+ int valid_input_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not the 
+ user has entered valid data. 
+ 
+ char new_xmin_string[20], new_ymin_string[20], 
+	 new_xmax_string[20], new_ymax_string[20]
+
+ Storage areas for the entered x- and y-coordinates, before 
+ they are converted into numbers.
+
+ char *formula_graphics_buffer, *x_axis_graphics_buffer,
+	 *y_axis_graphics_buffer
+
+ Pointers to arrays for storing sections of screen memory.
+
+ char error_message[50]
+
+ Passed to 'translate_formula', to store any error message
+ resulting from that function.
+
+  char formula_store[150]
+
+ Stores copy of formula which is passed to  
+ 'translate_formula' function.
+
+ double storage_area
+
+ Used when swapping the values of minimum and maximum 
+ coordinates.
+FUNCTION DEFINITION :
+
+	tidy_the_formula()
+
+DESCRIPTION :
+
+As the name suggests, this function tidies up the formula. This is a preparation for the formula being passed to the translation functions.	
+
+First of all, the function searches for any upper case letters in the formula. If any are found, they are changed to lower case.
+
+Secondly, all spaces are stripped from the formula.
+
+Thirdly, any implied zeros are put into the formula. For example, if the formula is 'x^.5', it is changed to 'x^0.5'.
+
+Finally, if the user has entered the formula in the form 'y=f(x)', the 'y=' is stripped from the formula.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+	None.
+LOCAL VARIABLES :
+
+ char formula_buffer[150]
+
+ Temporary store for formula while it is being amended.
+
+ int loop
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	int test_the_formula( char *error_message )
+
+DESCRIPTION :
+
+This function checks for any obvious errors in the syntax of the formula.
+
+First, it makes sure that the user has actually entered a formula, i.e. the user did not just press the <return> key.
+If there is no formula, an appropriate message is copied into the string pointed to be the 'error_message' parameter.
+
+Secondly, the function makes sure that there are no invalid characters in the formula, e.g. a punctuation mark other than a decimal point.
+
+Thirdly, the function checks for any adjacent decimal points in the formula.
+
+Finally, the function makes sure that the parentheses balance, i.e. there are equal numbers of left and right brackets.
+
+PARAMETERS :
+
+ char *error_message
+
+ Pointer to a string where any error message generated by the
+ function can be stored for future reference.
+RETURN VALUE :
+
+If an error is found in the formula, the return value is 'NO', otherwise YES.
+
+LOCAL VARIABLES :
+
+ int left_brackets, right_brackets
+
+ The number of left and right brackets in the formula.
+
+ char *x
+
+ Stores temporarily individual characters in the formula.
+
+ int loop
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	int check_for_digits( char *string )
+
+DESCRIPTION :
+
+This function makes sure that the characters in the string pointed to by the parameter 'string' are numeric, i.e. either the numbers 0-9 or a decimal point. 
+
+PARAMETERS :
+
+ char *string
+
+ The string which is to be checked.
+
+RETURN VALUE :
+
+If 'string' contains a valid numeric value, the return value is 'YES', otherwise it is 'NO'.
+
+LOCAL VARIABLES :
+
+ int start_point
+
+ The character in the string at which to start checking. It
+ takes the value 0 or 1, depending on whether the first 
+ character of the string is '-'. If the first character is 
+ '-', 'start_point' is 1, indicating that checking should
+ start at string[1], i.e. the second character of the string.
+ int valid_number_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not 
+ 'string' contains a valid number or not. 
+
+ int loop
+
+ Self-explanatory.
+
+ int decimal_points
+
+ Number of decimal points in string. (There should not be
+ more than one decimal point in the string.)
+FUNCTION DEFINITION :
+
+	int check_for_accuracy( double minimum, double maximum )
+
+DESCRIPTION :
+
+This function works out whether or not the minimum and maximum coordinates which are passed to it define a range too small to be plotted.
+
+It does this by calculating the number of significant figures required to represent the coordinates. If this number is greater than ten, the coordinates fail the test.
+
+Coordinates will also fail if the division which will be produced from them, i.e (maximum-minimum)/5, needs more than eight decimal places to be represented.
+
+PARAMETERS :
+
+ double minimum, maximum
+
+ The coordinates to be checked.
+
+RETURN VALUE :
+
+The return value takes the values YES or NO. If the coordinates pass the test, it is YES, otherwise it is NO.
+
+LOCAL VARIABLES :
+
+ int sig_figures
+
+ The number of significant figures that will be needed to
+ represent the coordinates.
+
+ char exponent_buffer[30]
+
+ Used to store formatted string representations of 
+ coordinates, when their exponent is being extracted.
+
+ int min_exponent, div_exponent
+
+ The exponent of the minimum coordinate and the division, i.e.
+ (maximum-minimum)/5, respectively.
+
+I will now detail the functions which translate the formula into the tables which are discussed at length in the design. The interaction between these functions is shown overleaf.
+
+The core function of this section of the code is the 'translate_formula' function.
+
+FUNCTION DEFINITION :
+
+	int translate_formula( unsigned char *formula, 
+					   char *error_message )
+
+DESCRIPTION :
+
+This is the central function dealing with the translation of the formula, and basically consists of calls to other functions, which together complete the transition of the formula in string form to table form.
+
+The first routine which is called is 'abbreviate_functions'. This converts all the mathematical functions in the formula, e.g. sin, cos, log etc, into one-byte codes. If this function returns an error, an appropriate message is copied into the parameter 'error_message', and 'translate_formula' returns 'NO'.
+
+The 'change_numbers_to_letters' function is then called. This simply converts all the numbers in the formula into one-byte codes, and stores the numbers in the 'numbers_table' array.
+The next function to be called is 'add_multiply_operator'. This simply fills in all the implied multiplication operators which were left out by the user. For example, if the formula was 'x(x+2)', it would be changed to 'x*(x+2)'.
+
+The formula is then converted from a character array (a string) to an integer array. This is to allow codes of more than value 255 to be used in it.
+
+The 'create_formula_table' function is then called. It converts the formula into the formula table, which will later be used to calculate y-coordinates. If it finds an error in the formula, i.e. something which it cannot translate, it returns an error code, and an appropriate message is copied into the 'error_message' parameter, and the function returns 'NO'.
+
+If all is well, and the formula has been fully translated, the function returns 'YES'.
+
+
+PARAMETERS :
+
+ unsigned char *formula
+
+ Formula to be translated.
+
+  char *error_message
+
+ Pointer to an area in which to put any error messages 
+ produced by the function. The calling function can then 
+ 'read' these messages.
+
+RETURN VALUE :
+
+If the function finds an error in the formula, the return value is 'NO'. If the function is fully translated without error, the return value is 'YES'.
+
+LOCAL VARIABLES :
+
+ int formula_array[150]
+
+ Stores formula when it has been converted from string to 
+ integer array.
+
+ int error_flag
+
+ Indicates whether or not an error has been discovered in the 
+ formula. If it has, the flag has the value 'NO'. If not, 
+ it has the value 'YES'.
+
+ int loop
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	int abbreviate_functions( unsigned char *formula )
+
+DESCRIPTION :
+
+This function searches through the formula, looking for mathematical functions such as sin, cos, tan etc., which it converts into codes between 128 and 254.
+
+The algorithm for finding mathematical functions in the formula is relatively simple. 
+
+Each character in the formula is looked at in turn. If the character matches a first letter of one of the function names in the FUNCTION_TABLE array, the rest of the formula is looked at to see if the characters following this first letter match the characters of the function in the FUNCTION_TABLE array. For example, if the letter 's' is found in a formula, the procedure is to look at the characters after the 's' to see if they form a valid function name, e.g. 'sin'. If they do, the function is replaced by its code, in this case 128.
+
+Obviously, there are checks which must be applied. For example, if an 's' is found and the following characters are 'in', thus apparently giving the function 'sin', this still might not be a valid function name, as the next character might be 'c', e.g. the user has mistyped the formula 'sinc(x)' instead of 'sin(x)'. In this case an error must be indicated.
+A final check is to make sure that no lower case letters, apart from 'x', are left in the formula. If there are any lower case letters present, there must be a function in the formula which has not been translated.
+
+PARAMETERS :
+
+ unsigned char *formula
+
+ The formula in which the mathematical functions must be
+ encoded.
+
+RETURN VALUE :
+
+If an error is found in the formula, i.e. an invalid function is found, the return value is 'NO', otherwise it is 'YES'.
+
+LOCAL VARIABLES :
+
+ int found_function_flag
+
+ Indicates whether or not a function has been found.
+
+ int x, y, z, loop
+
+ All four are used in loops.
+
+ char formula_store[150]
+
+ Stores the formula while it is being amended.
+FUNCTION DEFINITION :
+
+	change_numbers_to_letters( unsigned char *formula )
+
+DESCRIPTION :
+
+This function searches the formula for numbers.
+
+If a number is found, it is stored in the array 'numbers_table', and it is replaced in the formula by an upper-case letter, i.e. a code from 65 to 90.
+
+PARAMETERS :
+
+ unsigned char *formula
+
+ The formula in which the numbers must be encoded.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int counter, loop
+
+ Used in loops.
+ int numbers_table_pointer
+ 
+ Pointer to current position in 'numbers_table' array.
+
+ char *dummy
+
+ Passed to 'strtod' library function. Has no use in my 
+ program.
+
+ char letter[2]
+
+ Stores letter which will replace number in formula.
+
+ int formula_store[150]
+
+ Stores the formula while it is being amended.
+FUNCTION DEFINITION :
+
+	add_multiply_operator( unsigned char *formula )
+
+DESCRIPTION :
+
+This function 'fills in' any implied multiplication operators in the formula which have been left out by the user.
+
+There are several different types of expression where this can occur. Some examples are -  'A(x+2)' which would have to be changed to 'A*(x+2)', '4x' to '4*x', '(x-1)(x+2)' to 
+'(x-1)*(x+2)', '3sinx' to '3*sinx', etc.. All these are catered for by this function.
+
+The function works by looking at each set of two characters in the formula, and deciding by their values whether or not they should be separated by a multiplication operator. For example, if it finds an 'x' followed by a left bracket '(', there must be an implied multiplication operator which needs to be filled in. Equally if it finds function code, e.g. 128 for 'sin', followed by an 'x', there is no case for inserting a multiplication operator.
+
+PARAMETERS :
+
+ unsigned char *formula
+
+ The formula in which the implied multiplication operators
+ must be detected.
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ char formula_store[150]
+
+ Stores the formula while it is being amended.
+
+ int loop
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	int create_formula_table( int *formula_array )
+
+DESCRIPTION :
+
+This function creates the formula table which is discussed at length in the design section.
+
+The first function it calls is 'pick_out_sub_section'. This function extracts a section from the formula which contains no brackets. If there are no brackets in the formula, then the whole formula is simply used.
+
+This sub-section of the formula is then passed to the 'translate_sub_section' function, which converts it into lines in the formula table.
+
+The converted sub-section is then passed to 'amend_the_formula', which updates the formula by removing the sub-section from the formula and replacing it with the line number representing the sub-section in the formula table.
+
+Thus the formula has had one set of brackets removed.
+
+The above process is continually repeated until all the brackets have been removed and each sub-section translated into lines in the formula table.
+
+When the whole formula has been translated, a final line is added to the formula table, indicating that the table is finished.
+
+PARAMETERS :
+
+ int *formula_array
+
+ The formula to be converted into a table.
+
+RETURN VALUE :
+
+If an error is found in the formula, the return value is 'ERROR'. Otherwise it is YES.
+
+LOCAL VARIABLES :
+
+ int sub_section[150]
+
+ Stores the sub-section of the formula which is extracted by 
+ the 'pick_out_sub_section' function.
+
+ int brackets_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not any 
+ brackets were found in the formula. 
+
+ int operators_flag
+
+ Indicates whether or not any operators were found in the
+ formula. Takes the value 'YES' or 'NO', or 'ERROR' if an 
+ error is found in the formula by the 'translate_sub_section'
+ function.
+
+ int finished_flag
+
+ Indicates whether or not the translation process has been 
+ completed or not. Takes the value 'YES' or 'NO'.
+FUNCTION DEFINITION :
+
+	int pick_out_sub_section( int *formula_array,
+						 int *sub_section )
+
+DESCRIPTION :
+
+This function uses a simple algorithm to extract sub-sections from the formula which contain no brackets.
+
+The formula is searched from right to left until a left bracket, '(', is found, and then the section of the formula to the right of this left bracket until the next right bracket, ')', is extracted.
+
+This procedure means that the correct priority of the different sections of the formula is always maintained.
+
+PARAMETERS :
+
+ int *formula_array
+
+ The formula from which the sub-section is to be extracted.
+
+ int *sub_section
+
+ Place to store the sub-section of the formula when it has 
+ been extracted.
+RETURN VALUE :
+
+If brackets are found in the formula, the return value is 'YES', otherwise it is 'NO'.
+
+LOCAL VARIABLES :
+
+ int inner_loop, outer_loop
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	int translate_sub_section( int *sub_section )
+
+DESCRIPTION :
+
+This function translates the sub-section of the formula which was extracted by the 'pick_out_sub_section' function into lines in the formula table.
+
+It first calls the 'translate_functions' function, which translates any mathematical functions such as sin, cos, etc. in the formula into lines in the formula table.
+
+The 'translate_operators' is then called three times. This function searches for specified operators in the sub-section, and translates any it finds into lines in the formula table.
+
+PARAMETERS :
+
+ int *sub_section
+
+ The sub-section of the formula which is to be translated.
+
+RETURN VALUE :
+
+If an error is found in the sub-section of the formula while being translated, the return value is 'ERROR'. 
+If there is not an error, but there are no functions or operators in the sub-section, the return value is 'NO'. Otherwise, the return value is 'YES'.
+
+LOCAL VARIABLES :
+
+ int found_expression_flag[4]
+
+ Array of flags which indicate whether operators and functions
+ have been found in the formula sub-section. If all the flags 
+ are 'NO', there are no operators or functions in the 
+ sub-section.
+FUNCTION DEFINITION :
+
+	int translate_functions( int *sub_section )
+
+DESCRIPTION :
+
+This function searches the formula sub-section for codes between 128 and 254, i.e. those representing mathematical functions such as sin, cos, log etc.. 
+
+When such a code is found, it is used, together with the code which comes directly after it, to form a line in the formula table.
+
+The sub-section is then amended, and the process repeated until all the mathematical functions have been translated.
+
+PARAMETERS :
+
+ int *sub_section
+
+ The sub-section of the formula in which the mathematical 
+ functions are to be translated.
+
+RETURN VALUE :
+
+If an error is found in the sub-section, the return value is 'ERROR'.
+If there is no error, but no functions are found, the return value is 'NO'. Otherwise, the return value is 'YES'
+
+LOCAL VARIABLES :
+
+ int loop_one, loop_two
+
+ Self-explanatory.
+
+ int exit_loop_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not the  
+ loop should be terminated.
+
+ int found_function_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not a 
+ mathematical functions has been found in the sub-section.
+FUNCTION DEFINITION :
+
+
+	int translate_operators( int *sub_section, 
+					     int operator_one,
+						int operator_two )
+
+
+
+DESCRIPTION :
+
+This function searches for either of the operators passed to it in the sub-section of the formula which is also passed to it.
+
+When an operator is found, the codes either side of it, along with the operator itself, are used to make up a new line in the formula table.
+
+The sub-section is then amended, by replacing the operator and its operands by the code representing the line in the table which was created.
+
+This procedure continues from left to right along the sub-section until all the operators have been dealt with.
+
+PARAMETERS :
+
+ int *sub_section
+
+ The sub-section of the formula in which the operators are to
+ be translated.
+
+ int operator_one, operator_two
+
+ The two operators which are to be searched for in the 
+ sub-section.
+
+RETURN VALUE :
+
+If an error is found in the sub-section, the return value is 'ERROR'.
+
+If there is no error, but no operators are found in the sub-section, the return value is 'NO'. Otherwise, the return value is 'YES'.
+
+
+LOCAL VARIABLES :
+
+ int loop_one, loop_two
+
+ Self-explanatory.
+
+ int exit_loop_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not the 
+ loop should be terminated.
+
+ int minus_flag_one, minus_flag_two
+
+ Take the value 0 or 1. Used when amending the formula to
+ indicate the length of the sub-section to be replaced. For 
+ example, if the operator had two positive operands, e.g.
+ A^x, three characters need to be replaced. But if the 
+ operator has two negative operands, e.g. -x^-A, five 
+ characters need to be replaced.
+
+ int found_operator_flag
+
+ Takes the value 'YES' or 'NO', depending on whether or not an 
+ operator has been found in the sub-section.
+FUNCTION DEFINITION :
+
+	amend_the_formula( int *formula_array, int *sub_section )
+
+DESCRIPTION :
+
+This function amends the formula, after part of it has been translated by the 'translate_sub_section' function.
+
+It takes the sub-section out of the formula, and puts in its place the code which represents it in the formula table.
+
+
+PARAMETERS :
+
+ int *formula_array
+
+ The formula in which the sub-section is to be replaced.
+
+ int *sub_section
+
+ The code which is to replace the sub-section.
+
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int formula_store[150]
+
+ Storage area for the formula while it is being amended.
+
+ int loop
+
+ Self-explanatory.
+I will now deal with the functions which actually draw the graph on-screen.
+
+These functions use the tables which were created when the formula was translated, as described previously.
+
+The core function of this set of routines is the 'draw_graph' function. 
+
+FUNCTION DEFINITION :
+
+	draw_graph( double new_minimum_x, double new_maximum_x,
+			 double new_minimum_y, double new_maximum_y )
+
+DESCRIPTION :
+
+This is the root function from which all the other functions concerned with producing a graph on-screen are called.
+
+The function starts by setting up the screen display. 
+
+The area on which the graph is to be drawn is coloured turquoise, and the black axis lines are put in place.
+
+The axis values are then put on both axes. The values are created by the 'convert_double_to_string' function, which takes a double precision value and converts it into a string, with number of decimal places specified in one of the parameters in the call to the function.
+In the same loop as that which puts the axis labels on, the grid is also put on, providing that the user wants a grid on the graph, i.e. 'grid_flag' is 'YES'.
+
+The other bits and pieces which go to make up the graph preparation are then put in place. The speed is put in the top left corner, with either 'Radians' or 'Degrees' below it. The formula is put along the bottom of the screen, and the 'x' and 'y' labels placed on the x- and y-axes. 
+
+Finally for the preparation, the word 'Drawing...' is displayed at the bottom left corner.
+
+The preparation has been completed, and the next thing to do is call the 'plot_points' function, which draws the actual curve of the graph on top of the screen created by the part of the 'draw_graph' function described above.
+
+Finally, the 'Drawing...' word is written over by a turquoise box, i.e. it disappears.
+
+PARAMETERS :
+
+ double new_minimum_x, double new_maximum_x, 
+	   new_minimum_y, double new_maximum_y 
+
+ The real minimum and maximum x- and y-coordinates for the 
+ graph to be drawn.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ char text_store[100]
+
+ Storage area for formatted text which will be printed
+ on-screen.
+
+ char label_store[15]
+
+ Stores text version of axis value before it is printed 
+ on-screen.
+
+ float left, right, top, bottom
+
+ The screen coordinates of the area on which the graph is to 
+ be drawn.
+
+ float label_position
+
+ Coordinate of position of axis value.
+
+ int division_exponent
+
+ The exponent of the division of the axes.
+
+ int decimal_places
+
+ The number of decimal places which the axes values should be  
+ taken to.
+
+ int loop
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	convert_double_to_string( double number, char *string, 
+						 int decimal_places )
+
+DESCRIPTION :
+
+This function takes the double precision floating number stored in 'number', and stores it to 'decimal_places' number of decimal places in the string 'string'.
+
+If 'decimal_places' is negative, it is changed to zero, and if it is greater than nine, it is changed to nine.
+
+PARAMETERS :
+
+ double number
+
+ The number which is to be converted to a string
+
+ char *string
+
+ Pointer to the string in which the converted number should be
+ placed.
+
+ int decimal_places
+
+ The number of decimal places that the number should be 
+ rounded to.
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ char format_string[5]
+
+ String used by the 'sprintf' function to convert the number 
+ to the correct number of decimal places.
+FUNCTION DEFINITION :
+
+	plot_points( int left, int right, int top, int bottom )
+
+DESCRIPTION :
+
+This is the function which actually plots the curve of the graph on-screen.
+
+It starts by selecting the colour MAGENTA, the colour which is used to draw the curve.
+
+The 'setviewport' library function is then called. This sets up a window on the screen specified by the coordinates which are passed to it. This window then becomes the only place on-screen where output is displayed. In other words, if the 'plot_points' function at a later stage tries to draw part of the graph outside the specified area, it will not be drawn. This allows the graph to pass in and out of the specified area at will without disturbing the rest of the screen display.
+
+Another effect of the 'setviewport' function is that screen coordinates are relative to the top left corner of the window. In other words, if the coordinates (0,0) are used after the call to 'setviewport', they refer to the top left corner of the window rather than the top left corner of the screen. This has no great advantage for me other than perhaps simplifying the source code slightly.
+
+After the call to 'setviewport', two constants are defined. These are used when converting between real and screen coordinates, and are solely to simplify the source code.
+
+A loop is then set in action which, via calls to 'calculate_point', plots the curve on-screen.
+
+If on any run through the loop a point cannot be calculated, the user is informed that that point is not defined on the graph, and invited to abort the graph is he desires. If he wishes to continue with the graph, a gap is left where the point could not be plotted.
+
+The 'calculate_point' function works out the real coordinates of the graph. These have to be converted into screen coordinates, using a formula containing the constants defined earlier.
+
+These screen coordinates are then tested to make sure that they are in the range +/- 32000. If they are not, they are set to the appropriate extreme value. 
+
+The screen coordinates are then used to draw a line on the screen, which makes up one small part of the overall graph.
+
+The loop continues until the right-hand-side of the graph has been reached.
+
+Finally, the 'setviewport' function is called again to restore the screen to its original state, i.e. with no window.
+
+PARAMETERS :
+
+ int left, right, top, bottom
+
+ Screen coordinates of area of screen where graph is to be 
+ plotted.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ double x, y1, y2
+
+ Screen coordinates of point to be plotted.
+
+ double x_constant, y_constant
+
+ Constants used to convert from real to screen coordinates.
+
+ double point_one, point_two
+
+ Real coordinates of the two points which will be joined 
+ together to form the line which is the smallest element
+ of the graph.
+ int continue_flag
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not the
+ user wishes to continue drawing a graph after an undefined 
+ point has been found.
+FUNCTION DEFINITION :
+
+	double calculate_point( double x )
+
+DESCRIPTION :
+
+This function takes a real x-coordinate and calculates from it the corresponding real y-coordinate, using the tables which were created when the formula was translated.
+
+It works by running through the formula table, 'f_table', and translating each line until it reaches the end of the table, when it returns the y-coordinate which has been calculated.
+
+For each line, the function first works out, by a process of elimination, whether the left and right values are number table codes (65-91), x's, or line labels (1000+). The function then uses the 'numbers_table' array, the 'x' parameter, or the 'f_t_values' array respectively to assign the correct value to the variables 'real_left' and 'real_right'.
+
+The function then uses the code representing the operator in the line to perform the appropriate mathematics on the 'real_left' and 'real_right' variables defined above, and stores the result in the 'f_t_values' array.
+
+When the last line is being translated, 'real_left' is simply returned. No mathematics is performed, and the 'f_t_values' array is not changed.
+PARAMETERS :
+
+ double x
+
+ The real x-coordinate from which the y-coordinate is to be
+ calculated.
+
+RETURN VALUE :
+
+The y-coordinate which has been calculated is the return value.
+
+LOCAL VARIABLES :
+
+ int pointer
+
+ Pointer to current place in the formula table.
+
+ double real_left, real_right
+
+ Store the actual numeric values of the left and right codes
+ in the lines in the formula table.
+FUNCTION DEFINITIONS :
+
+	double power( double x, double y )
+	double divide( double x, double y )
+	double sine( double x )
+	double cosine( double x )
+	double tangent( double x )
+	double arcsin( double x )
+	double arccos( double x )
+	double arctan( double x )
+	double logbase10( double x )
+	double logbaseE( double x )
+	double squareroot( double x )
+
+DESCRIPTION :
+
+These functions are used by the 'calculate_point' function when working out the value of lines in the formula table.
+
+For example, if a line in the table contains the code for 'sin' in the operator field, the 'sine' function will be called.
+
+The functions are all very simple. They do some elementary error-checking on the 'x' parameter which has been passed to them, and then call the appropriate 'C' library function to carry out the actual calculation.
+
+The error-checking depends on the function. For example, the two logarithmic functions, 'logbase10' and 'logbaseE', need to make sure that 'x' parameter is greater than zero. 
+
+Some functions such as the 'sine' function do not need any error-checking.
+
+However, all the trigonometric functions have the added complication that they return different results depending on the value of the 'radians_flag' variable. This is easily coped with. If the 'x' parameter passed to the function is in degrees, i.e. 'radians_flag' has the value 'NO', 'x' is converted into radians using a simple formula before it is passed to the appropriate library function.
+
+If an error is detected, e.g. a negative value is passed to one of the logarithmic functions, the 'point_defined_flag' variable is set to 'NO', and the function returns a value of zero.
+
+PARAMETERS :
+
+There are either one or two parameters for each of these functions, each type 'double'.
+
+For example, the 'power' function needs an 'x' and a 'y' parameter, where the return value will be 'x' to the power 'y', whereas the 'sine' function needs only an 'x' parameter, the return value being sin(x).
+RETURN VALUE :
+
+The return value is always a 'double', and is the result of the required calculation.
+
+LOCAL VARIABLES :
+
+The only function with a local variable is the 'power' function. It uses the variable defined as 'double dummy', which is passed to the 'modf' library function when error-checking is being carried out. As suggested by the name, the value placed in this variable by the 'modf' function is not used in my program.
+
+
+These functions complete the description of the routines which together produce the graph on-screen.
+The only functions which are left to describe are those not directly connected to any of the menus of the program. They are of a general nature, and are called at various points in the program.
+
+I will deal first of all with the functions connected with the operation of the mouse.
+
+
+FUNCTION DEFINITIONS :
+
+	initialise_mouse()
+	show_mouse()
+	hide_mouse()
+
+DESCRIPTION :
+
+The 'initialise_mouse' function turns on the mouse using the bios interrupt number 33h. If the mouse cannot be initialised, the 'mouse_installed' global variable is set to 'NO'.
+
+The 'show_mouse' function shows the mouse cursor on-screen, using the same bios interrupt.
+
+The 'hide_mouse' function hides the mouse cursor, again using interrupt 33h.
+
+PARAMETERS :
+
+	None.
+RETURN VALUES :
+
+	None.
+
+LOCAL VARIABLES :
+
+ union REGS inregs, outregs
+
+ Used to manipulate the cpu registers.
+The next set of general functions are those connected with error-handling.
+
+FUNCTION DEFINITION :
+
+	allocation_error( char *function )
+
+DESCRIPTION :
+
+This function is called when the program has tried to allocate memory, e.g. for a graphics operation, and there has not been enough free memory to allow it.
+
+In theory, this function should never need to be called during normal operation of the program. The only time it may be needed is if a user has tied up a lot of his memory with other programs, e.g. memory-resident programs such as 'Sidekick'.
+
+The function closes the graphics system using the 'closegraph' library function, displays an error message telling the user which function the error has occurred in, and then puts the user back to the DOS prompt, using the 'exit' library function.
+
+PARAMETERS :
+
+ char *function
+
+ String containing the name of the function in which the 
+ error has taken place.
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+	None.
+FUNCTION DEFINITION :
+
+	display_error_message( int x1, int y1, char *message, 
+					   char *endword )
+
+DESCRIPTION :
+
+This function is called at various points in the program. It displays an error message on the screen, partially defined by the 'message' and 'endword' parameters, and then waits for a key to be pressed, before returning to the calling function.
+
+As an example, if the 'message' parameter contained the string "There is an invalid character in the formula.", and the 'endword' parameter contained the word "continue", this function would display on the screen :
+
+	ERROR : There is an invalid character in the formula.
+		   Press any key to continue.
+
+The 'ERROR' is highlighted in red, with the rest of the message in blue.
+
+PARAMETERS :
+
+ int x1, y1
+
+ The coordinates of the top-left corner of the box in which
+ the error message is to be placed.
+ char *message, *endword
+
+ Strings containing text used to customise the error message.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ unsigned char *graphics_buffer
+
+ Stores sections of screen memory.
+
+ unsigned char text_store
+
+ Temporary store for text which is to be displayed on-screen.
+
+ int x2, y2
+
+ Coordinates of bottom-right corner of box containing error
+ message.
+FUNCTION DEFINITION :
+
+	int display_warning_message( int x1, int y1, 
+						    char *line_one, 
+						    char *line_two )
+
+DESCRIPTION :
+
+This function works in a similar way to the 'display_error_message' function, except that the messages are even more customised, and the key pressed by the user is recorded.
+
+As an example, suppose the parameter 'line_one' contains the string "The current data will be lost if you load now.", and the 'line_two' parameter contains "Do you still wish to continue (Y/N) ?", the message displayed will look like :
+
+	WARNING : The current data will be lost if you load now.
+			Do you still wish to continue (Y/N) ?
+
+The 'WARNING' is highlighted in red, with the rest of the text in blue.
+
+The key which is subsequently pressed by the user is stored in the variable 'answer', and used to determine the return value for the function.
+
+PARAMETERS :
+
+ int x1, y1
+
+ Coordinates of the top-left corner of the box containing the
+ warning message.
+
+ char *line_one, *line_two
+
+ Text used to customise the warning message.
+
+RETURN VALUE :
+
+If the user presses the 'Y' key, the return value is 'YES', otherwise it is 'NO'.
+
+LOCAL VARIABLES :
+
+ char *graphics_buffer
+
+ Stores sections of screen memory.
+
+ char *answer
+
+ The key pressed by the user.
+
+ int x2, y2
+
+ Coordinates of the bottom-right corner of the box containing 
+ the warning message.
+FUNCTION DEFINITION :
+
+	int point_not_defined_error()
+
+DESCRIPTION :
+
+This function is called by the 'plot_points' function when the x-coordinate is undefined on the graph.
+
+It works in a similar way to the two error/warning message functions just described, except that the message is not customised.
+
+The user is simply asked if he wishes to continue drawing the graph. His response is stored in the variable 'answer', and is used to determine the return value.
+
+PARAMETERS :
+
+	None.
+
+RETURN VALUE :
+
+If the user chooses to continue, i.e. presses 'C', the return value is 'YES', otherwise it is 'NO'.
+
+LOCAL VARIABLES :
+
+ char *graphics_buffer
+
+ Stores sections of screen memory.
+
+ char *answer
+
+ The key pressed by the user.
+ 
+ int x1, y1, x2, y2
+
+ The coordinates of the box containing the error message.
+FUNCTION DEFINITION :
+
+	int matherr( struct exception *a )
+
+DESCRIPTION :
+
+This function is unique in the program, in that it is never called directly by the program.
+
+When a program which contains mathematics, such as mine, is compiled, TURBO C automatically includes a library function called 'matherr' in the code. This function is then called when a fatal mathematical error occurs at run-time, e.g. the program tries to take the log of -2. This function supplies an appropriate error message, and then terminates the program and dumps the user back onto the DOS prompt. Obviously, this is not an ideal situation.
+
+The only way round this is to write a new version of 'matherr' to replace the standard routine which TURBO C supplies, and this is exactly what I have done. Thus, when a fatal mathematical error occurs, my customised 'matherr' function is called, rather than the crude function automatically supplied.
+
+This function represents the last line of defence as far as mathematical errors are concerned. It is much more preferable to detect the errors before they take place. In fact, this is what usually happens. 
+
+For example, if an attempt is made to take the ln of -2, the 'logbaseE' function detects that an error is about to take place, and does not try perform the operation, thus preventing the 'matherr' function from being called. This is preferable because it keeps control over the flow of the program firmly with the program. If the 'matherr' function has been called, control has been lost, as the 'matherr' function has no way of knowing what function called it, and therefore cannot return there in case it would induce an error in the flow of the program.
+
+Thus, when the 'matherr' function has been called, the graph being drawn must be terminated, and the 'menu_system' function called to allow the user to try a different graph. This is not ideal, as the user is not given the option to continue with the graph, ignoring the point which caused the error, but is a distinct improvement over the 'dump to DOS' situation.
+
+There are five distinct types of error which are detected and identified by this function. These are clearly shown in the source code. 
+
+With the mathematical functions currently implemented in the program, I cannot see either the 'DOMAIN' or 'SINGULARITY' errors occurring, but the others are possibilities.
+
+PARAMETERS :
+
+ struct exception *a
+
+ Pointer to a structure containing information about the
+ error which has taken place. TURBO C automatically passes
+ this information to the 'matherr' function when the error
+ occurs.
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int x1, y1, x2, y2
+
+ Coordinates of box containing the error message.
+
+ char *graphics_buffer
+
+ Stores sections of screen memory.
+
+ char error_message[60]
+
+ Stores text for error message which is to be displayed.
+Finally, I will describe the remaining functions. They are not related, and fall under the 'miscellaneous' category.
+
+FUNCTION DEFINITION :
+
+	text_input( char *prompt, int x, int y, 
+			  int maximum_characters, char *reply )
+
+DESCRIPTION :
+
+This function is used to prompt the user for input and store his reply.
+
+The text contained in 'prompt' is displayed at the coordinates defined by the 'x' and 'y' parameters.
+
+The function then waits for the user to enter a string of characters from the keyboard, terminated by pressing the <return> key. This string is displayed directly to the right of the prompt, as the user types it.
+
+The string is stored using a loop which records the key presses one at a time until the <return> key is pressed. If the number of characters specified in the 'maximum_characters' parameter is reached, no more characters are displayed on-screen or recorded. This gives protection against screen displays being ruined by the user typing outside the area that he is intended to. However, note that the function does not terminate when the maximum number of characters has been reached, as the delete key is still operative.
+
+PARAMETERS :
+
+ char *prompt
+
+ Text used for prompt to user.
+
+ int x, y
+
+ Screen coordinates of prompt.
+
+ int maximum_characters
+
+ The maximum number of characters which the function will 
+ allow the user to enter.
+
+ char *reply
+
+ Pointer to area where the user's reply will be stored.
+
+
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int terminate_flag 
+
+ Takes the value 'YES' or 'NO'. Indicates whether or not the 
+ user has pressed the <return> key or not.
+
+ int counter
+
+ Self-explanatory.
+FUNCTION DEFINITION :
+
+	char *sub_string( char *string, int start_position,
+				  int number_of_characters )
+
+DESCRIPTION :
+
+This function is used to extract strings from within other strings. 
+
+The string which is to be extracted is defined by the 'start_position' and 'number_of_characters' parameters. The 'start_position' is the character within the original string at which the sub-string starts, and 'number_of_characters' is the number of characters after and including the starting one that are to be extracted.
+
+As an example, suppose the string which is passed to the function is "Hello Fred!", and is stored in the variable 'string'. To extract the word "Fred" from this, the call to 'sub_string' would be :
+
+	sub_string( string, 7, 4 );
+
+The function works by first copying the original string into the global variable 'sub_string_store'. A pointer, called 'pointer_to_sub_string', is then set to the point in this string where the sub-string starts. 
+
+A terminator is then inserted in the string where the sub-string should end. The value of 'pointer_to_sub_string' can therefore be used to access the sub-string, and is the return value of the function.
+
+PARAMETERS :
+
+ char *string
+
+ The original string from which the sub-string is to be 
+ extracted.
+
+ int start_position
+
+ The character at which to start the extraction.
+
+ int number_of_characters
+
+ The number of characters to be extracted.
+
+RETURN VALUE :
+
+The return value is a pointer to the start of the sub-string.
+
+LOCAL VARIABLES :
+
+ char *pointer_to_sub_string
+
+ Pointer to start of the extracted sub-string.
+FUNCTION DEFINITION :
+
+	box( int border_lines, int x1, int y1, int x2, int y2 )
+
+DESCRIPTION :
+
+This is a simple function which draws a white box on the screen.
+
+It is used at numerous points throughout the program, where either input is required from the user, or output to the user is being produced.
+
+The coordinates of the box are defined by the 'x1', 'y1', 'x2' and 'y2' parameters.
+
+If the 'border_lines' parameter is 1, a grey line is drawn around the box. If the parameter is 2, two grey lines form the border around the box.
+
+PARAMETERS :
+
+ int border_lines
+
+ The number of lines which form the border around the box.
+
+ int x1, y1, x2, y2
+
+ Screen coordinates of the box.
+RETURN VALUE :
+
+	None.
+
+LOCAL VARIABLES :
+
+ int current_colour
+
+ Used to store the current screen foreground colour, so that
+ it can be restored when the box has been drawn.
+
+
+
+			....................
+
+
+
+This concludes the system maintenance documentation.
+
+All the functions which I have written are documented. For the details of the library functions which I have used, consult the TURBO C Reference Guide.

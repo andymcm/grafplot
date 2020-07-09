@@ -1,0 +1,1245 @@
+DESIGN
+
+
+
+
+I will now outline the system design. This includes both the hardware which will be used to implement and test the system, and detailed specifications of how the software should look, and what operations it should perform.
+
+
+
+
+HARDWARE
+
+
+The analysis of the problem has uncovered a distinct lack of choice as far as the hardware of the proposed system is concerned.
+
+The computer on which to base the system has been narrowed down to an IBM PC compatible, with output to both a high-resolution display and a dot-matrix printer.
+
+A more detailed specification of the hardware that the software should support is given overleaf.
+Processors :
+
+All the processors which are found in IBM PC compatible machines should be supported. As discussed in the analysis, this simply involves writing 8086/8088 compatible code.
+
+Graphics :
+
+Either of the two main graphics standards, i.e. EGA and VGA, are more than capable of satisfying the system requirements.
+
+I have decided to produce a system which supports both of these standards. This makes the programming slightly more
+difficult, but to support only VGA would exclude a significant proportion of potential users (those with only EGA displays), and to support only EGA would ignore the enhanced capabilities of those users with VGA displays. 
+
+The details of how this dual support is accomplished is given later.
+
+Storage devices :
+
+Despite the multitude of different types of storage devices in use on PCs, file-handling is not really a problem.
+
+As long as the software created uses standard MSDOS (the operating system of the PC) commands, there should be no problems with compatibility.
+Printers :
+
+I have decided to produce a system with support for both 9-pin and 24-pin dot-matrix printers. It is rare nowadays to find a computer set-up in education without one of these.
+
+The printer codes used will be EPSON-compatible, which should mean that the program will work with any EPSON-compatible printer. This encompasses practically every dot-matrix printer currently in use.
+
+
+These specifications give the general type of system that the software should support. I will now detail the hardware which I will be using to develop the system.
+
+   Make and Model :  Amstrad PC2086 DDCM
+			     
+   Processor      :  Intel 8086, running at 8Mhz
+
+   Operating sys. :  MSDOS, version 3.3
+
+   Graphics card  :  Paradise VGA card.
+			    
+   Input devices  :  AT-style 102-key QUERTY keyboard
+			      Microsoft-compatible mouse
+
+   Printer        :  Star LC24-10 24-pin dot-matrix printer.
+			      (Epson LQ-800 compatible)
+Obviously, this is an ideal development system. The processor is the 8086, therefore code which works on this system should work on any PC compatible machine.
+
+The VGA card supports both VGA and EGA modes, therefore a system utilising both can be developed and tested easily.
+
+The mouse provided is the industry-standard Microsoft-compatible type, which should mean that programmed support for it will be compatible with most other PC systems.
+
+Finally, the 24-pin Star printer is the required type, i.e. uses EPSON codes, and as a bonus also supports 9-pin codes, so the complete programming for the printer can be developed on this one system, without access to a 'real' 9-pin printer.
+
+
+All this means that a system developed on the hardware described above should be transferable to a wide range of other PC systems. 
+
+However, compatibility between computers is rarely a completely clear-cut issue, and to make sure that the system is as compatible as it should be, I will test it on another system. 
+
+The test system is based around a Research Machines Nimbus 286. As the name suggests, it uses the 80286 processor, which is a faster chip than the 8086 used in the development system. Clearly, the code generated on the Amstrad should work perfectly on the Nimbus, if a little quicker.
+
+A VGA card, similar to that on the Amstrad, is used, and although a different model, the mouse is Microsoft-compatible, and should therefore work with no problems.
+
+The Nimbus uses a later version of MSDOS, version 4.00, and has a 40 Mbyte hard disc built it. This provides a good opportunity to test the compatibility of the file-handling  procedures.
+
+Finally, the printer that the Nimbus uses is an actual EPSON model, the 24-pin LQ-850. This is the ideal machinery on which to test that my code is EPSON-compatible!
+
+This only leaves one part of the system untested. The 9-pin codes must be tested on a genuine 9-pin printer. This is not a problem, as a Star LC-10, the 9-pin version of the model used with the Amstrad, is available to connect to the development system.
+
+This concludes the discussion of the hardware that will be used to both develop and test the system. I feel that it represents a fair range of the type of hardware likely to be used by any potential users of the system.
+SOFTWARE
+
+
+The basic requirements of the software have been stated in the analysis. I will now go into more precise detail about how the program should look, i.e. the user interface, and also some general ideas on algorithms for some of the procedures which will be needed, e.g. how the parser will work.
+
+At a very simple level, the proposed system might seem to conform to the traditional INPUT-PROCESS-OUTPUT flow of data. Indeed, in its basic form, this is exactly what happens. 
+
+
+In order that a graph may be drawn, the user must INPUT certain fundamental pieces of data. 
+
+First of all, he must enter a formula of the type 'y=f(x)', e.g. 'y=3x'. 
+
+Secondly, he must enter the scales on which the graph will be drawn. To be more precise, he must give a minimum x-coordinate, a maximum x-coordinate, a minimum y-coordinate, and a maximum y-coordinate. For the example formula above, suitable values for these coordinates might be 0, 10, 0, and 30 respectively, which would produce a straight line from the bottom-left corner of the graph to the top-right corner. 
+When these basic pieces of data have been input, they can be PROCESSED. This involves translation of the formula, as described later, and then calculation of the y-coordinates corresponding to the x-coordinates in the range defined by the minimum and maximum x-coordinates input previously. 
+
+These points can then be OUTPUT to the screen, to form the graph required.
+
+Thus the INPUT-PROCESS-OUTPUT is complete.
+
+However, the system is not nearly as straightforward as this might suggest. 
+
+Although it is convenient to think of the system in this simplified way, it only represents the strict conversion of the traditional pen and paper method of drawing graphs into a computer-based one. 
+
+This conversion is, of course, fundamental to the implementation, as it is the basic solution to the problem as originally defined. However, as mentioned in the analysis, the computer allows much more than this restrictive method of operation, where the three stages of input, process, and output are strictly defined separate steps. The computer allows flexibility which is impossible with traditional methods, by simple use of interaction.
+
+When a graph is drawn using pen and paper, care must be taken to choose the correct scales. Otherwise all the effort involved in producing the graph will be wasted, as a completely new one will have to be drawn. 
+
+With a computer system, the original choice of scales is relatively unimportant. Only a rough idea of the required axes is needed. The resultant rough draft of the graph can then be modified as necessary. The x- or y-axis can be extended or reduced until exactly the right result is achieved. 
+
+In fact, this principle applies not only to the scales. After an original draft has been made, the formula can be altered to see how that affects the graph. This is useful when comparisons need to be made between a number of different formulae, using the same axes.
+
+Accuracy is another area where the computer system excels. If a graph is drawn, but it is too coarse, i.e. not enough points have been plotted, the program can be instructed to redraw the graph more accurately, or vice versa, if speed is more important than accuracy. (The more accurate a graph is, the longer it takes to draw.)
+
+Of course, the user may know beforehand exactly the graph he wants to plot, in which case the INPUT-PROCESS-OUTPUT system is perfectly adequate, but it would be a shame to exclude the flexibility described above when the operation of the computer makes it so feasible.
+User Interface
+
+
+With the type of interaction just discussed, the user interface will obviously play an important role in the system. Indeed, the first requirement will be that it is capable of this interaction. 
+
+The requirement set out in the analysis must also be kept in mind when designing the interface, i.e. its user-friendliness.
+
+There is one type of user interface which springs to mind when thinking of both user-friendliness and interaction on a PC. It is the GUI (Graphical User Interface). 
+
+In recent years, the GUI has become the standard environment for interaction between the user and the personal computer. This is portrayed most vividly in the popularity of the Apple Macintosh series of computers, and on the IBM PC with the use of operating system shells such as GEM (Digital Research) and Windows (Microsoft). 
+
+The popularity of GUIs stems from their ease of use by even a novice user, and also the standardisation they have produced, which means that a person who has used a GUI in one program will quickly learn how to use the GUI on another, because all GUIs are similar in use.
+
+There is one major drawback to the use of GUIs. As suggested by the name, they rely heavily on the use of graphics, and generally require fairly high-resolution graphics to operate. Not only does this entail high hardware costs in terms of monitors, graphics cards etc., but the processor on which the GUI is running must be powerful enough to cope with this extensive graphical work.
+
+The GUI seems the ideal user interface to use in my system, for the reasons of interaction, ease of use, and standardisation already mentioned. The major drawback of GUIs, i.e. their burden on resources, does not apply in my case, as the hardware required for it to operate, i.e. fast processor and high-resolution graphics, are a prerequisite for the system output anyway. The only alternative that I can see is a text-based menu system which would switch to graphics mode when output was needed. However, I cannot see any distinct advantage to such a system, other than possibly a slightly shorter development time than the GUI system, and it has the major drawback of inhibiting the interaction between user and program, because the menus and output (i.e. the graph) are never on-screen at the same time, as they would with the GUI.
+
+Having decided, in principle, to implement some sort of graphics-based user interface, the next step is to define more precisely what it should look like and what the various menus will contain etc..
+
+The type of interface I have in mind is shown in the diagram below. It uses a pop-up menu system, as used on most Apple Macintosh applications, and in several PC ones, notably Lotus 1-2-3, the industry standard spreadsheet, and the afore-mentioned Windows and GEM applications, as well as numerous other word processors, paint programs etc.
+There are two distinct regions on the screen. Section A holds the menu headings. It is never usually overwritten or used in any other way. To select a particular menu heading, the mouse pointer can be moved over a particular menu heading and the mouse button pressed. Alternatively, a certain key combination can be used to select a heading. The key combinations will be decided by the programmer. For example, if the user wanted to choose a menu called 'FILE', the program might accept CTRL-F as the signal to select that menu. (This means that the CTRL key and the 'F' key are held down simultaneously)
+
+Section B is known as the workspace. It is the area where any communication from the program to the user is produced. The program's main use for this area is in actually producing the output, i.e. the graphs, but is also used for the pull-down menus, and for prompting the user for data, displaying error messages etc..
+
+An example of the user interface in action will help clarify the previous points. 
+
+Instead of going through the complete process of drawing a graph from scratch, let's assume that a graph of y=x has already been drawn, with x-coordinates ranging from 0 to 20 and y-coordinates from 0 to 10. Suppose we wish to change the y-axis to '0 to 20'.
+The user chooses the GRAPH menu.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+In this diagram, the mouse pointer is being used to select the appropriate menu heading.
+
+However, the key combination CTRL-G would work equally well.
+The GRAPH menu is displayed. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The user then chooses the 'New y-axis' option, again by pointing at it with the mouse. 
+(Pressing 'Y' on the keyboard would also have worked)
+The menu disappears, and the area of the screen that was overwritten is restored. A box then appears, asking for the new y-coordinates to be entered.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The user types in the new y-coordinates, 0 and 20, from the keyboard. 
+The graph is redrawn, using the new y-coordinates, but the same formula and x-coordinates as before. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The user is now free to access any of the menus again.
+
+This example gives an idea of what the program should look like in operation. I will now give in detail the function of each of the menus, and explain the purpose of each command they contain.
+
+FILE Menu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The FILE menu is, as the name suggests, involved with file-handling. 
+
+The parameters associated with a graph (formula, min. and max. coordinates etc. ) can be saved to secondary storage (usually either floppy or hard disk), and recalled at will. 
+
+As previously mentioned, the file-handling should be carried out by standard MSDOS functions, thus allowing any MSDOS-compatible storage device to be used.
+
+There are three options on the menu :
+
+
+'LOAD' option :
+
+Load a graph into memory from disk, and display the graph on-screen. 
+
+If there is already a graph in memory which has not been saved, a warning should be given that the current data will be overwritten. 
+
+The user should then be asked to enter the name and path of the file to be loaded. The path specifies the drive and directory that the file is stored in. For example, if the file 'SINE.GRA' was stored on a disk in drive B:, in a subdirectory called DATA, the full path and filename would be 'B:\DATA\SINE.GRA' .
+
+As with all prompts for data from the program, a box should be produced in the middle of the screen, as shown by the diagram overleaf.
+
+
+(It may be assumed that any further prompts for data will be treated in a similar way.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+If the file cannot be found, e.g. the user has mistyped the path, a suitable error message should be displayed.
+
+If the file is found, but the data within it is found to be corrupt, again a suitable error message should be produced.
+
+If the file is found, and the data is not corrupt, the graph should be drawn immediately on-screen.
+'SAVE' option :
+
+
+This option will be picked when the user wishes to save the graph to disk, using the last path and filename specified. 
+
+For example, if the user has loaded a graph that he previously created, and then changed some part of it, he could use this option to overwrite the original graph with the new version, without having to retype the file name.
+
+If a filename has not been previously specified, i.e. no load or save operations have already taken place, the 'SAVE AS' option should be invoked.
+
+It would preferable that before a save take place, the current data is summarised on-screen, and the user prompted as to whether a save should go ahead. This would act as a verification measure.
+
+If the graph cannot be saved, e.g. the specified path no longer exists, a suitable error message should be displayed.
+
+When the graph has been saved, a message confirming the action should be produced.
+
+'SAVE AS...' option :
+
+This is similar to the SAVE option, except that the user is asked to specify a path and filename, before the save takes place.
+
+When the path and filename have been specified, the program should check that the file does not already exist. If it does, the user should be warned that the file currently on disk will be overwritten if the save continues, and invited to abort the process.
+
+All the other verification checks and messages are the same as those for the 'SAVE' option.
+
+
+FILE STRUCTURE
+
+The descriptions of the options only give the user's view of the file-handling functions, and therefore do not show up the structure of the files being manipulated. 
+
+In fact, the structure is very basic, and is simply a stream of parameters dumped serially to disk, and obviously retrieved serially. This is shown in the diagram below.
+
+
+
+
+All the fields are fixed length. The only one which could be made variable length would be the formula. This would, however, be a waste of effort, as the whole file will only be a few dozen bytes long, and space is therefore not a problem.
+
+The other fields are self-explanatory. The minimum and maximum x- and y-coordinates are stored as floating point numbers, just as they will be stored inside the program. The speed is an integer between 1 and 10, whose function will be described later. The Radians/Degrees flag is obviously only relevant for formulae containing trigonometric functions, but for ease of operation, it will simply be included in every file.
+
+Finally, the hash total will be used to ensure the integrity of the data. The hash total will be calculated in a very simple but effective way. Each byte in the file has a value between 0 and 255. These values are added together to arrive at a total, which is then saved as the last item in the file. For example, if the file contained 150 bytes, the hash total could be a value anywhere in the range 0 to 38250. It is clear from this that the chances of corrupt data passing through this check are very small.
+
+This concludes the file-handling procedures.
+GRAPH Menu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The graph menu accesses the functions which are central to the operation of the program, as it contains the commands used to actually produce a new graph on-screen. 
+
+I will first state what each menu option does, and then go into some detail about how the data is processed to produce the actual graph.
+
+'NEW GRAPH' option :
+
+This option creates a completely new graph. 
+
+The user is prompted for a formula, and minimum and maximum x- and y-coordinates. 
+
+The formula first goes through a number of basic checks. For example, there must be equal numbers of left and right brackets. These checks are detailed later, as are the extensive translation processes for the formula.
+
+The coordinates are also checked, first to make sure that they are valid numbers, and secondly that they lie in the range 
++/- 99,999,999, and finally that they are not more than 8 decimal places/10 significant figures.
+
+'NEW FORMULA' option :
+
+The user is prompted only for a formula. 
+
+The formula, along with previously defined minimum and maximum x- and y-coordinates, are used to draw a new graph. 
+
+If no x- and y-coordinates have been previously defined, an error message to that effect should be produced.
+
+The checks on the formula are the same as those used in the 'New graph' option.
+'NEW XY-AXES' option :
+
+The user is prompted only for minimum and maximum x- and
+y-coordinates. 
+
+These coordinates and the previously defined formula are used to draw a new graph. 
+
+If no formula has previously been defined, an appropriate error message should be produced.
+
+The checks on the coordinates are the same as those used in the 'New graph' option.
+
+'NEW X-AXIS' option :
+
+The user is prompted only for the minimum and maximum 
+x-coordinates. 
+
+These x-coordinates, along with the previously defined y-coordinates and formula, are used to produce a graph. 
+
+As before, if the formula and y-axis have not already been defined, an error message should be produced.
+
+The checks on the coordinates are the same as those used in the 'New graph' option.
+
+'NEW Y-AXIS' option :
+
+As for NEW X-AXIS, except that the y-coordinates are asked for, and the previously defined x-coordinates and formula used to draw the graph. 
+
+Similar error-trapping should occur.
+
+
+
+TRANSLATING THE FORMULA
+
+The paragraphs above describe what the user sees when each of the options are chosen. 
+
+It does not, however, explain how the program will process the input, i.e. the formula and the minimum and maximum x- and y-coordinates, into the output, i.e. the graph.
+
+As was mentioned in the analysis, the process of converting a formula from the usual mathematical notation, e.g. y=3(sin(x)), into something which the computer can use to calculate points, is quite a difficult one. 
+
+During the procedure of trying to write an efficient and flexible parser which could do this, I tried and tested (using small prototype systems written in GW-BASIC) several different approaches to the problem. 
+
+At first, I tried to write the less flexible of the two feasible types mentioned in the analysis. This was the type which accepts formulae only in a strict predetermined form, e.g. a quadratic equation in the form ax2+bx+c, but not (a+x)(b+x) or x(ax+b)+c. 
+
+However, it quickly became apparent that such a system was not only inflexible for the user, but also difficult to write in such a way that anything other than long, slow, spaghetti-like code would be produced, in order to bring it up to the minimum level of flexibility required. Clearly the assumption that this implementation would be simpler was incorrect. What was needed was a more general, modular approach which could cope with any sort of mathematical expression. 
+
+The design process for this type of parser was an extensive one, involving many redesigns, but finally the system as described now was formulated. From the simple prototype system produced (again in GW-BASIC), it would appear that this system is both extremely flexible (and therefore user-friendly) and efficient. However, it is only when integrated into the final implementation that its quality will be proved/disproved.
+
+The following few pages give a general outline of how the parser translates a formula. 
+
+(The mechanics of how each individual part works is not given  
+ in detail. This is left to the implementation section.)
+
+The first thing to point out is how the parser is connected to the actual point-plotting process. Because a large number of points may be plotted (perhaps more than 500), it would be pointless to translate the formula from scratch each time a point needs to be plotted. Therefore the system that I have adopted is that for each graph, the formula will be translated once, at the start, into a sort of 'object code'. 
+
+This object code is in the form of a table which represents the formula split into a number of simple steps. Then, as each point is plotted, the table is 'run through' to obtain the coordinates. Obviously, if the formula were translated each time a point needed to be plotted, no 'object code' would ever be produced, thus making the implementation simpler, but this system would be too slow in operation to be considered.
+
+The diagram overleaf is a simple flowchart to illustrate the general principle of the system just described.
+
+In fact, once the table has been produced, the process of actually calculating and plotting the points is a relatively simple one. This is explained in detail later. 
+
+The complex part is to actually set up the table in the first place. In fact, there are essentially four tables involved altogether, with the one already mentioned the central one. I will refer to this central table in future as the formula table, as it represents the formula split into simple steps. 
+
+The formula table, and the numbers table which is used to store the numbers in the formula, are created during the process of translating the formula represented by box 4 in the flowchart on the previous page. 
+
+The third table is a static one holding the valid function names (sin, cos, log etc. ), and the fourth is used in the process of calculating y-coordinates, represented by box 5 on the flowchart.
+
+This may sound confusing, but all will become clear as the overall process is explained. 
+
+In order to illustrate what is happening in each step of the process, I will show what would happen to the formula y=3sin(x/2.5).
+
+This formula has been chosen as it contains a selection of most of the elements likely to be found in any one formula, i.e. operators (division and implied multiplication), floating-point numbers (3 and 2.5), functions (sin), and parentheses. 
+
+I will now outline the processes represented by boxes 2, 3 
+and 4 that this formula would go through.
+
+Elementary Testing (Box 2)
+
+At this stage, before any alterations are made to the formula and translation begins, some basic tests are carried out on the formula.
+
+These tests are mainly to intercept typing mistakes, and only represent a crude barrier to errors in a formula, as there are a limited number of checks which can be carried out at this stage. The majority of the error-checking takes place as the formula is being translated.
+
+The precise checks which will be used cannot be known at this point, and are therefore left to the implementation. However, there are certain traps which will probably be in place during this stage.
+
+One check would be to look for any invalid characters in the formula. For example, if an exclamation mark, '!', is found in the formula, an error should be produced.
+
+Another check would be that the parentheses balance. In other words, there must be the same number of left brackets as right brackets.
+
+Obviously, if the formula fails any of the tests at this stage, it is not passed to the next stage. Instead, the user will be asked to re-enter it.
+
+Preparation (Box 3)
+
+The preparation stage performs some simple operations on the formula, to make it easier for the translation procedures to translate it.
+
+Once again, the exact definitions of the operations needing to be performed on the formula during this stage cannot be known at this time, and are therefore left to the implementation section.
+
+However, there are certain basic things which need to be done. 
+First of all, all spaces would need to be stripped from the formula. Secondly, implied multiplication signs and zeros would need to be filled in. 
+
+An implied multiplication is one where the user has left out the '*' character, but still expects multiplication to take place. This occurs in our example formula, where the implied multiplication is between the 3 and the 'sin'. The '*' character would be inserted, thus making the formula 'y=3*sin(x/2.5)'.
+
+An implied zero needs to be filled in where a decimal point has been used with a number less than 1 and the leading zero has been omitted. For example, the formula 'y=.5x' would be changed to 'y=0.5x'. This does not occur in my example formula.
+
+Translation (Box 4)
+
+The translation procedure is the one which converts the formula which the user has entered, and which has consequently been tidied up by the Preparation stage, into the tables which form the 'object code' used to calculate points on the graph.
+
+There are three main steps in this procedure. 
+
+The first step is used to translate any functions such as sin, cos, log etc. into codes. 
+
+The second step replaces all the numbers in the formula by codes, and stores the numbers in the numbers table.
+
+The third step is by far the longest and most complex. It actually turns the formula into lines in the formula table.
+
+
+Stage 1 : Encode the Functions
+
+The first step involves searching the formula for any functions such as sin, cos, log, etc. and changing them to a code. 
+
+Each function has a code from 128 to 254. Obviously, this allows a maximum of 127 codes, but in fact only a small proportion of these codes will be used. 
+
+The codes for each function are stored in the static table already mentioned. It has the form :
+
+
+		
+
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+	  	  
+
+
+
+
+As the codes from 142-254 are unused, there is plenty of space to add new functions in the future.
+
+The example formula has only one function, 'sin'. The formula will change from :
+
+
+	y=3*sin(x/2.5)
+to 
+	y=3*[128](x/2.5)	
+
+
+Codes in the formula are represented here by being enclosed in square brackets '[]', but obviously these brackets do not appear in the actual formula when stored in the computer.
+
+When all the functions have been encoded, some error-checking can be performed. 
+
+The functions are all represented by codes greater than 127, and therefore there should be no letters left in the formula apart from 'x' (as in 'y=x' ). 
+
+If there are any letters, then there must have been a function in the formula which was not translated. In other words, the user mistyped the name of a function, or used one which does not exist. In either case, the translation process must be terminated, and the user asked to re-enter the formula.
+
+Stage 2 : Encode the Numbers
+
+The second step involves searching the formula for any floating-point numbers, and abbreviating them to a code between 65 and 91. 
+
+This allows for a maximum of 26 numbers in any one formula, which is more than enough. 
+
+In fact, the numbers 65-91 represent the ascii values of the letters A to Z. So the example formula becomes :
+
+	y=A*[128](x/B)
+
+To be more uniform about the notation, the formula could equally be represented as :
+
+	y=[65]*[128](x/[66])
+
+but I feel this is more difficult to read than using A-Z.
+
+Obviously the numbers which have been abbreviated must be stored for future reference. As mentioned previously, they are stored in the numbers table. For our example, it becomes :
+
+		
+
+		 
+		 
+Clearly the number of entries in this table depends on the number of numbers in the formula, and thus the table created will be different for each formula produced. The table will be accessed later when the points are being plotted.
+
+No error-checking takes place during this stage.
+
+
+Stage 3 : Create the Formula Table
+
+This third stage is the major one.
+
+The formula table is an array of codes used to represent the formula.
+
+Before going into the detail of how the formula is translated, I will explain the format of this formula table.
+
+
+
+		
+
+	
+	
+	
+
+
+
+The label is used to refer to that particular line in the table. The labels are codes starting from 1000. The first line has code 1000, the second 1001, etc..
+
+Each line in the table represents a basic mathematical expression.
+
+The operator is a code representing, not surprisingly, the operator for the expression. This could be the ascii code for one of the basic operators such as ^,*,/,+,-, or could be a code between 128 and 254 representing the functions such as sin, cos, log etc..
+
+Leftvalue and rightvalue are codes representing the operands of the expression. For example, if an expression is 3+4, the operands are 3 and 4. If the expression has only one operand, e.g. sin x, only leftvalue is used, rightvalue being ignored.
+
+The codes in leftvalue and rightvalue can be one of three types. They can be a code between 65 and 91 representing a value stored in the numbers table, e.g. sin A. Or they can be the code 120, which represents the variable 'x', e.g. sin x. Or they can be a code from 1000 upwards, representing another line in the table, e.g. log [1002], which means take the log of the result of the expression represented by line 1002 in the formula table.
+
+An example will help to clarify this system. 
+
+Let's use the same example as before, 'y=3*sin(x/2.5)'. The 'Encode the functions' and 'Encode the numbers' stages would have converted the formula to 'y=A*[128](x/B)'. 
+
+The formula table created from this would be :
+
+	
+
+	
+			    
+	
+ 			    
+
+
+The first line represents the expression 'x/B'. 
+
+The second line represents the expression 'sin [1000]', which means take the sine of the expression represented by line 1000. In other words, this line represents 'sin(x/B)'.
+
+The third line represents the expression 'A*[1001]', which means multiply 'A' by the expression represented by line 1001. In other words, 'A*(sin(x/B))'.
+
+The fourth line uses the operator 255, which signifies that this is the last line in the table. The value in leftvalue, in this case [1002], is the final answer. The expression represented by line 1002 is 'A*(sin(x/B))', which is indeed the original formula.
+Thus, when a y-coordinate corresponding to an x-coordinate needs to be calculated, a simple piece of code can be used to run through the table, calculating and storing the value for each line in the table. When the last line has been reached, the y-coordinate will have been calculated.
+
+To clarify this, I will show what should happen if a y-coordinate is being calculated from our example formula.
+
+The formula is 'y=3*sin(x/2.5)'. Suppose the x-coordinate is 75. By simple human calculation from the formula, the y-coordinate is 3*sin(75/2.5) = 3*sin(30) = 3*0.5 = 1.5. 
+
+The y-coordinate which is to be plotted is 1.5, but how will this be calculated by the computer from the formula table created previously?
+
+As already discussed, the first line of the formula table represents 'x/B'. The value of x is 75, and the value of B (from the numbers table) is 2.5. Therefore this line represents '75/2.5', i.e. 30. This value is easily calculated by the computer, and stored for future reference in yet another table, which I will call the expression table.
+
+The expression table will thus be :
+
+		
+
+		
+The next line, 1001, represents the expression 'sin [1000]', which means take the sine of the result of the expression represented by line 1000. The result of this expression can be found in the table just discussed. It is, of course, 30. This line therefore means 'sin 30', which the computer works out to be 0.5, and stores this in the expression table, which now becomes :
+
+		
+
+		
+		
+
+
+
+The third line, 1002, represents the expression 'A*[1001]'. From the numbers table and the expression table, this expression can be decoded to '3*0.5', which can be easily worked out by the computer as 1.5. This value is again stored in the expression table, which becomes :
+
+
+		
+
+		
+		
+		
+
+
+The final line, 1003, signals by its operator that it is the final line of the table, and that the value of the expression represented by line 1002 is the final answer. From the expression table, it can be seen that this value is 1.5. Thus the y-coordinate is 1.5, just as was originally calculated.
+
+
+The paragraphs above have given an outline of the format of the formula table after it has been produced, and how it is used to calculate a y-coordinate from an x-coordinate.
+
+I will now attempt to explain how the formula table is created in the first place.
+
+The flowchart overleaf gives the basic outline of how the table is formed. 
+
+In simple terms, a sub-section of the formula is picked out, then translated into a line (or lines) in the formula table. 
+
+The label of the line of the formula table which represents the sub-section is then put into the formula itself in place of the sub-section, and another sub-section picked out and translated. This process is continually repeated until the whole formula has been translated.
+
+The complete formula has then been replaced by one line label, which therefore represents the formula.
+
+I will now go into the detail of how this is done, by reference to the flowchart boxes.
+
+
+Extract sub-section (Box 2)
+
+This procedure is used to extract a piece of the formula which is simple enough to be translated by the procedure represented in box 3.
+
+By 'simple enough', I mean that the sub-section of the formula should contain no brackets, as the translation procedure cannot cope with brackets.
+
+Obviously, to extract sections with no brackets, the innermost set of brackets of a set of nested brackets must be extracted first. 
+
+For example, if the formula is 'y=3*(x/(2+x))', there is no point in extracting the section within the outer set of brackets, i.e. 'x/(2+x)', as this section itself contains brackets. The first section to be extracted should be '2+x'.
+
+In order to always make sure that the innermost set of brackets is extracted first, I have devised the simple algorithm described overleaf which will perform the extraction.
+
+
+   The formula is searched from right to left, until a left 
+   bracket, '(', is found. 
+
+   The portion of the formula from this left bracket to the 
+   next right bracket, ')', is then extracted from the 
+   formula. 
+
+
+The extracted subsection of the formula is then passed through the translation process. 
+
+If there are no brackets in the formula, this procedure will do nothing, and the whole formula will simply be passed through the translation process.
+
+No error-checking is carried out at this stage.
+
+In our example, 3*sin(x/2.5), which has by this stage, become A*[128](x/B), the subsection 'x/B' will be picked out first, if the process above is followed.
+
+Translate Sub-section (Box 3)
+
+This stage is in two parts. 
+
+The first part is to search the sub-section, in my example 'x/B', for any functions (sin, cos, etc.). This is simple as we only need to check for codes between 128 and 254. 
+
+Obviously, in my example, there are no functions, so to illustrate what happens, let's assume the sub-section is 'A*[128]B'. The sub-section is searched, and the code 128 is found. This code, and the value directly to the right of it, in this case B, are used to make up a new line in the formula table. 
+
+
+Assuming that no lines have already been produced, the example sub-section 'A*[128]B' will create a new line in the table as follows :
+
+	
+
+	 		    
+
+
+The sub-section will then be amended, so that it becomes 
+'A*[1000]', as the label 1000 now represents the '[128]B'
+
+The amended formula is then searched again to see if any further functions need translating. If not, the sub-section is put through the second stage of the translation process, the search for operators, otherwise the previous procedure is repeated and the function replaced by another line in the table.
+
+A simple error-check which would need to be used here is that each function has a valid operand. A valid operand, as previously mentioned, is either an upper case letter (code 65-91), an 'x' (code 120), or a label (code 1000+).
+
+
+The second part of this stage is the search for operators.
+
+The operators are searched for in order of priority, i.e. ^ is looked for first, then * and /, then + and -. For each operator encountered, the operator and the values to the left and right of it are used to make up a new line in the table. Suppose our sub-section is '[1000]*A^x'
+
+The '^' operator is found first, and put into the table as follows, assuming only one previous line, defined as sin(x), has already been placed in the table.
+
+	
+
+			    
+	
+The sub-section is then amended to the '[1000]*[1001]'.
+
+
+The '*' operator is the next one to be found, and using the same principle as before, the table now becomes :
+
+
+	
+
+			    
+	
+	
+
+
+
+Finally, the sub-section is amended to '[1002]'. 
+
+As in the search for functions, the only obvious error-checking is that the operands are valid.
+
+
+Both the functions and the operators have been dealt with, and the sub-section should therefore be fully translated.
+
+
+Amend the Formula (Box 4)
+
+The sub-section will have been translated down to one value, a label e.g. '[1002]' as above. 
+
+This code now replaces the original sub-section in the formula. For example, if the original formula was 'A*[128](x/B)' and 'x/B' had been translated to '[1000]', this process would amend the original formula to 'A*[128][1000]'.
+
+
+Finish off Formula Table (Box 6)
+
+When the whole formula has been translated, there should be one label left, which represents the formula, e.g. '[1002]'. 
+
+This is used along with the code 255 for the operator, to finish off the table. An example last line might be :
+
+	
+
+	
+	
+	
+			  
+
+
+Thus the table, and therefore the whole formula translation process, is complete.
+Example :
+
+With the flowchart, used in conjunction with the explanations given of each box, it should be fairly easy to see the flow of data round the system. 
+
+However, to try to make it crystal clear, I will give a complete example of the making of the table, using the original example formula, '3*sin(x/2.5)'.
+
+
+Original formula : '3*sin(x/2.5)'
+
+Stage 1 : Encode the functions 
+
+		Sin function abbreviated to code 128.
+		Formula becomes '3*[128](x/2.5)'
+
+
+Stage 2 : Encode the numbers
+
+		Numbers 3 and 2.5 are replaced by letters A and B
+		Formula becomes 'A*[128](x/B)'
+		
+		Numbers table is constructed :
+
+			
+			 
+			 
+Stage 3 : Create the formula table 
+
+		I will illustrate this stage by reference to the 
+		flowchart boxes.
+
+  Box 1 : Brackets in formula ? - YES
+		
+  Box 2 : Section 'x/B' picked out.
+		
+  Box 3 : Functions ?
+		No functions found.
+		   
+		Operators ?
+		Operator '/' found. 
+		'x/B' replaced by label '[1000]'.
+		   
+		Formula table becomes :
+
+			
+			
+			
+
+		Operators ?
+		No more operators.
+
+  Box 4 : Formula becomes 'A*[128][1000]'
+
+				--BACK TO START--
+
+  Box 1 : Brackets in formula - NO
+
+  Box 5 :	Functions ?
+		Function '[128]' found. 
+		'[128][1000]' replaced by '[1001]'. 
+		   
+		Formula table becomes :
+
+			
+		
+			
+					 
+
+		Sub-section becomes 'A*[1001]'
+
+		Functions ?
+		No more functions found.
+
+		Operators ?
+		Operator '*' found.
+		'A*[1001]' replaced by '[1002]'. 
+		
+		Formula table becomes :
+
+			
+
+			
+					 
+			
+  Box 5 : (continued)		
+		
+		Operators ?
+		No more operators.
+
+  Box 6 : Formula table becomes :
+
+
+			
+		 	
+			
+			
+			
+
+
+
+					--END--
+			
+
+
+The translation process is thus complete. At first glance it may seem complicated, but if followed through systematically, the operations should become fairly clear.
+As a final point on the tables process of calculating coordinates, I would like to try and justify this method of translating the formula.
+
+Let's look at the formula :
+
+	y=3.2*(6/(x+(1.2/x^2)+sin(2.4*cos(90+(x/2)))))
+
+This formula represents the most complex type of formula likely to be used in my system. 
+
+It is 45 characters long, uses six levels of parentheses, and numerous numbers, operators and functions. 
+
+To translate this up to 500 times for a graph would simply take much too long to be considered, However, when changed into tables, the task of calculating 500 points is much simpler, and therefore much quicker. The tables which are created are as follows :
+
+
+			
+			 
+			 
+			 
+			 
+			 
+			 
+			 
+
+
+			
+			
+				
+			
+			
+			
+					
+			
+			
+			
+			
+			
+
+
+If we compare these tables to the ones created for the previous example formula '3*sin(x/2.5)', it is clear that these tables are longer, but the point is that they are not as long in proportion to the complexity of the function being translated. 
+
+Whereas even the simple formula produced four lines in the formula table, the extremely complex formula used here only produced twelve lines. I think that this example bears out my original claims about the efficiency of this tabular system. Hopefully this claim will be justified in the implementation.
+
+
+PLOTTING THE POINTS
+
+
+So far, I have explained how the formula is translated into a set of tables, and how these tables can be used to produce a y-coordinate from an x-coordinate.
+
+I will now explain how these procedures are integrated into the overall process of drawing a graph.
+
+As was stated as the start of the Graph Menu section, the user is prompted to enter five pieces of data before a graph is drawn. These are the formula, which is translated into the tables already discussed at length, and the minimum and maximum x- and y-coordinates, which I will refer to as Xmin, Xmax, Ymin, and Ymax.
+
+The format of the screen output is shown overleaf.
+
+The formula of the graph being drawn is displayed at the bottom of the screen. 
+
+The speed (see 'OPTIONS Menu' section) is displayed at the top left, with the word 'Radians' or 'Degrees' below it, depending on which is in use.
+
+X0 to X4 and Y0 to Y4 are labels which show the x- and
+y-coordinates at various points along the x- and y-axes. 
+	
+X0 to X4 and Y0 to Y4 can be defined in terms of Xmin, Ymin, Xmax, and Ymax :
+
+
+		X0 = Xmin
+	
+		X1 = Xmin + 0.2(Xmax-Xmin)
+
+		X2 = Xmin + 0.4(Xmax-Xmin)
+
+		X3 = Xmin + 0.6(Xmax-Xmin)
+
+		X4 = Xmin + 0.8(Xmax-Xmin)
+
+
+		Y0 = Ymin
+
+		Y1 = Ymin + 0.2(Ymax-Ymin)
+
+		Y2 = Ymin + 0.4(Ymax-Ymin)
+
+		Y3 = Ymin + 0.6(Ymax-Ymin)
+
+		Y4 = Ymin + 0.8(Ymax-Ymin)
+
+
+This simply means that if, for example, Xmin was 5 and Xmax 10, then the values 5,6,7,8, and 9 would be used as labels for the x-axis. The y-axis works in exactly the same fashion.
+Once all of this basic information, including the formula, the speed, and the axes and their labels etc. is placed on-screen, the graph itself can be drawn. This is achieved by plotting points on-screen and joining them up.
+
+To explain how this is done, it is first necessary to distinguish between screen coordinates and real coordinates. 
+
+Real coordinates are the coordinates of the graph, the range of which are entered by the user. The screen coordinates are the coordinates used by the programmer to refer to dots, or pixels, on the screen. The range of these screen coordinates  is therefore constant for one particular graphics mode. For example, the highest VGA resolution uses a grid of 640x480 pixels. Thus the screen x-coordinates range from 0 to 639, and the screen y-coordinates from 0 to 479. Similarly, the best EGA resolution uses a grid of 640x350, with screen x-coordinates from 0 to 639 and y-coordinates from 0 to 349.
+
+Obviously, if a graph is going to be plotted on-screen, there must be some method of converting real coordinates, which are manipulated by the formula translation procedure, into screen coordinates, which are used to actually plot the points 
+on-screen. In fact, a formula can be derived to do this job. The details of the formula will be given in the implementation. 
+
+The flowchart overleaf shows how the process is used.
+
+Calculate next real x-coordinate (Box 1)
+
+A simple loop, along with a simple division, are used to determine the real x-coordinate to be plotted. 
+
+For example, suppose the range of real x-coordinates for a graph is 0 to 100, and that the drawing area on-screen is 500 pixels wide. It does not take a great deal of mathematics to see that the real coordinates will go in a series 0, 0.2, 0.4, 0.6, ......, 99.2, 99.4, 99.6, 99.8, 100.
+
+
+Calculate real y-coordinate corresponding to real x-coordinate (Box 2)
+
+The real x-coordinate calculated in box 1 is passed through the formula translation process already discussed.
+
+The corresponding real y-coordinate will thus be calculated. 
+
+
+Convert real coordinates into screen coordinates (Box 3)
+
+The aforementioned real-to-screen coordinate conversion formula is used to convert the real x- and y-coordinates calculated in boxes 1 and 2 respectively into screen x- and y-coordinates.
+Plot screen x- and y-coordinates (Box 4)
+
+The screen x- and y-coordinates (calculated in box 3) are plotted on-screen. 
+
+In fact, the dot representing the coordinates is not plotted. Instead, in order to produce a graph which is a continuous line, this dot is joined to the previous dot by a straight line. Thus the final graph is made up of a series of straight lines, and at any one time, two sets of X-Y coordinates must be known. The exact implementation of this complication in the point-plotting process is left to the implementation section.
+
+Thus the graph has been drawn.
+
+
+I have now explained fully both the process used to translate the formula, and how this translated formula is used to plot a graph on the screen. The 'GRAPH menu' section is therefore complete.
+PRINT Menu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The PRINT menu deals with producing hard-copy of a graph which has already been produced on-screen. 
+
+There are only two options. One is picked when the user wants to print his graph on a 24-pin printer, the other if he has a  9-pin printer.
+
+
+'Print-24 pin' option : 
+
+A printout is produced using EPSON 24-pin codes. 
+
+This should allow it to be used with a multitude of 24-pin dot-matrix printers currently available.
+
+'Print-9 pin' option  : 
+
+The same printout is produced using EPSON 9-pin codes, for 9-pin dot-matrix printers.
+
+
+In both cases, a message should be produced telling the user that printing is in progress, and that a certain key will terminate the process prematurely. This means that if a mistake is made, and the user does not want the printout, he need not wait the considerable time it may take for the printout to be completed.
+
+There are obvious error checks which must be included. 
+
+The first thing that must be ensured is that a graph has already been defined. If not, an error message to that effect must be produced. 
+
+Next would be a check to make sure that the printer is ready to receive data. If it is not, an error message must be produced, otherwise printing can continue.
+The most straightforward algorithm for outputting the graph to the printer is a partial screen dump. In other word, pixels on-screen are simply replicated dot-for-dot in the printout. 
+
+This seems the best method for my system, but there are a couple of complications. 
+
+First, either of the printers mentioned may work at a higher definition than the screen, therefore a number of dots may be needed in the printout to represent each of the dots on-screen. 
+
+Secondly, the printer works in only two colours, whereas the screen works in sixteen. The answer to this problem is to 'map' some of the sixteen screen colours to black on the printer, and some to white. But obviously difficulties will arise if, for example, a blue pixel on one area of the screen must be represented by black in the printout, and a blue pixel in another area of the screen must be represented by white. 
+
+These complications will be dealt with at implementation time.
+OPTIONS Menu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The options menu is used to provide miscellaneous commands which are not linked to any of the other specific menus. 
+
+The 'Speed', 'Radians/Degrees', and 'Grid on/off' options do not have any immediate effect. They only change the next graph which is drawn.
+
+However, there may be times when the user wishes to see their effect on the graph he has just drawn, in which case he should use the 'Redraw' option.
+'Speed' option : 
+
+This is used, rather unsurprisingly, to change the speed. 
+
+The speed is something which I have deliberately not discussed thus far, as I thought it would only complicate things. 
+
+Until now, it has been assumed that if the drawing area on-screen was 500 pixels wide, then 500 points would be plotted on-screen. 
+
+In fact, this is only true if speed 1 is used. This is the slowest speed, and means that the maximum number of coordinates possible are drawn. 
+
+However, if accuracy is not as important as speed, some accuracy can be sacrificed to enable the graph to be drawn faster. 
+
+This gain in speed is accomplished very easily. If, for example, speed 2 is chosen, only every second pixel is drawn. In other words, only 250 points would be plotted, if the drawing area was 500 pixels wide. 
+
+This is obviously much quicker than plotting 500 points, but there is an equal loss in detail on the graph. In other words, a coarser graph is produced. 
+
+In a lot of cases, this loss of detail is completely unnoticeable, and therefore the higher speed should be used. 
+
+The speeds range from 1 to 10. Speed 3 means that only one in three points are plotted, speed 4 that one in four are plotted, and so on, up to speed 10 in which only one in ten points are plotted. 
+
+This flexibility obviously allows the user to work out the speed/accuracy compromise for any graph he wishes to draw.
+
+Probably the most useful situation for this option is when the user is not exactly sure of the graph that he wants to plot. He can 'play about' with the various parameters at a high inaccurate speed until he has the graph that he wants. He can then redraw the graph using a low speed to gain an accurate graph before printing it out. 
+
+The usual checks must be carried out on the speed value entered, i.e. first that it is a number, and second that it lies in the required range, one to ten. If one of these requirements is not fulfilled, a suitable error message must be produced.
+'Radians/Degrees' option : 
+
+This menu option changes according to the type of angle measure currently in use. 
+
+If the angle measurement currently in use (which is displayed in the top left corner of the screen) is radians, the menu option will be 'Degrees', and vice versa. Obviously, this allows the user to switch between the two.
+
+
+'Grid on/Grid off' option :
+
+Like the previous one, this option changes, this time according to whether or not the grid is currently on or not.
+
+When the grid is on, the option is 'Grid Off', thus permitting the user to turn the grid off, and vice versa.
+
+The grid is simply an aesthetic add-on to the system. 
+
+When on, a grid is displayed behind the graph, making it easier to estimate the position of any particular point on the graph. 
+
+When off, the graph is drawn on a plain background.
+'Redraw' option : 
+
+This option does exactly what it says. It redraws the graph. It will usually be used after one or more of the other options on the OPTIONS menu have been used.
+
+For example, if a graph is drawn using speed 10, but the user finds that the graph is too coarse, and he wants to see what it looks like at a lower speed, he can choose a slower speed using the 'Speed' option already discussed, and then redraw the graph using this option. 
+
+Similarly, if a graph is drawn using degrees as the angular unit of measure, and the user wishes to see the graph using radians, he can select the 'Radians' option already described, and use this option to redraw the graph.
+
+There is only one error check which needs to be carried out. There must be a graph already defined, otherwise it cannot be redrawn! If a graph has not been defined, an appropriate error message must be produced.
+ZOOM Menu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This menu has only two options. They are 'Zoom in' and 'Zoom out', and they perform the functions you might expect.
+
+'Zooming' is one of the benefits of the flexibility that a computerised graph-plotting system can provide.
+
+If the user draws a graph, and then sees a specific area which he would like enlarged, he can use the 'Zoom in' option to do this.
+'Zoom in' and 'Zoom out' options  :
+
+As the name suggests, these options allow the user to zoom in or out of some part of the graph which has been drawn. 
+
+Zooming in will be done by forming a rectangle on the screen using the mouse. This rectangle will then represent the area which should be redrawn full size. 
+
+The rectangle is defined by pointing the mouse to one corner of the rectangle, pressing the mouse button, and then 'dragging' the pointer to the other corner of the rectangle, and then releasing the mouse button. The graph should then be redrawn immediately. The diagram below shows someone zooming in on part of a y=x2 graph.
+The user should then, if he wishes, be able to zoom in again. However, the facility to zoom out as many times as he has zoomed in is provided using the second of the two options specified for this menu, therefore the number of times that he can keep zooming in must be restricted, as the coordinates for each graph at each level must be stored. 
+
+In other words, if the user zooms in 10 times, 10 sets of coordinates must be stored. This is not really a problem, as it is unlikely that anyone would want to zoom in more than, say, 20 times. 
+
+The easiest data structure to store these coordinates would seem to be a stack. Thus when a 'zoom in' takes place, the coordinates of the current graph can be pushed onto the stack, and when the user zooms out, the coordinates can be popped off the stack. The details of this system are left to the implementation.
+
+If the system is being used without a mouse, this menu becomes inactive, and an error message should be produced if it is selected.
+
+The only error-checking that needs to be done is to make sure that the user has not tried to zoom in on an area of the graph too small to be drawn. In other words, the scales of the new graph must be able to be represented in ten significant figures/eight decimal places.
+
+QUIT Menu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This is a very simple menu. There are two options - 'Sure – Yes', or 'No'. 
+
+In other words, the fact that there are options at all is simply a verification check. Instead of the user just selecting the menu heading QUIT to exit the program, he is asked to verify his choice to quit by selecting either option YES, or NO. Obviously, if the user does want to quit, he selects YES. However, if has selected the menu by mistake, or has changed his mind, he can select NO, and carry on as normal. 
+If the option YES is picked, and there is no graph in memory which has not been saved to disk, the user is returned to the operating system command line.
+
+If, however, the YES option is picked, and there is a graph in memory which has not been saved, the user should be warned that the data currently in memory will be lost if he continues, and invited to return to the menu system.
+
+				  ...........
+
+
+The discussion of the menus and each of their options is thus concluded, and the design is therefofe almost complete.
+
+The proposed solution has been outlined, including the hardware on which the system should be based, and detailed program specifications including the user interface, file handling, and data structure design.
+
+All that remains is to state my choice of programming language and justify it, and finally make out a test plan for the system which can be used after the program has been written, to prove its integrity.
+
+PROGRAMMING LANGUAGE
+
+As stated in the analysis, there are essentially four options open to me as far as the choice of programming language is concerned.
+
+They are assembly, Pascal, BASIC, and C.
+
+The analysis also suggested that any of these would be capable of doing the job. 
+
+However, having drawn up the design, I am now in a better position to judge the most suitable language for my system.
+
+It is still true that any of the four languages above could be used to write the required system, but each involves varying degrees of expertise/development time.
+
+First of all, there is no doubt in my mind that to start to program this system in assembly would be virtually impossible in the time scale desired. This is especially true with the implementation of high-resolution graphics and the formula translation procedures required. 
+
+At the other end of the scale is BASIC. The big advantage with BASIC is its ease of use. In theory, this should mean that development time for the system would be relatively small. 
+
+However, this gain in time is only really true for small programs, as for larger programs BASIC's lack of structure is a severe hindrance. Couple this with its lack of low-level functions (for the mouse support etc.) and its slowness, BASIC does not seem such a good idea.
+
+With assembly and BASIC ruled out, only Pascal and C remain as viable options.
+
+The major problem that I have with Pascal is my rather inextensive knowledge of it. Development time would undoubtedly be lost while trying to learn the finer details of the language.
+
+My knowledge of C is somewhat greater, but the problem with it is that it is more difficult to program in, so development time is lost in that respect.
+
+The conclusion from the previous two paragraphs is therefore that development time for both would probably be roughly the same.
+
+However, there are a couple of small things which are in favour of C.
+
+First, C produces more compact, efficient code than Pascal. (C's original use was in the programming of operating systems)
+
+Secondly, C allows a variation in level which high-level Pascal cannot match. Functions available in C range from those which deal with high-level data structures to those which manipulate low-level cpu registers.
+
+This flexibility may be useful when writing procedures dealing with manipulation of sections of screen memory or accessing mouse functions.
+
+
+Having settled for C, the only decision left is the implementation of the language to use. 
+
+I have access to both Microsoft QuickC and Borland Turbo C. The choice is really not that important, as both have their good and bad points. 
+
+However, I will go for the Borland package, as it provides better support for low-level functions and compiles quicker, only being let down by its rather rudimentary editor.
+
+				  ...........
+
+The design is therefore complete, apart from the test plan, which follows now.

@@ -1,0 +1,552 @@
+USER DOCUMENTATION
+
+
+INTRODUCTION :
+
+
+What is Grafplot ?
+
+Grafplot is a piece of software created to produce graphs of mathematical formulae of the form 'y=f(x)'.
+
+
+The graphs are easy and quick to produce, using the user-friendly pop-up menu system, and the results can either be plotted solely on your display, or displayed and then printed out on your dot-matrix printer.
+
+
+Graphs of a wide range of formulae can be produced. These include polynomial functions, trigonometric functions, logarithmic functions, and even combinations of these types.
+
+
+Finally, the software has been designed to be extremely flexible, so do not be afraid to experiment with it. Use it to its full, and you will not be disappointed!
+BEFORE YOU START
+
+There are certain prerequisites for the successful use of this software.
+
+The first requirement is that you have a 100% IBM compatible machine. If your machine uses any of the 80x86 range of processors, and the MSDOS operating system, then it is likely to fall into this category. If you are not sure, consult your PC manual.
+
+The second requirement is that you have at least 384K of free RAM memory. Unless you have one of the original IBM PCs, your machine should have at least this amount. However, if you have a lot of memory tied up by TSR programs, e.g. 'Sidekick', or by a RAM disk, you may have to free up this memory before running the program.
+
+The third requirement is that you have at least an EGA display adaptor. Grafplot supports both the EGA and VGA graphics standards, but not CGA or Hercules. 
+
+To produce printouts of the graphs you create, you will need a dot-matrix printer, either 9-pin or 24-pin, which uses EPSON codes. Your printer manual will tell you if this is possible. If it indicates that the printer is compatible with the EPSON LX-800, for 9-pins, or the LQ-800, for 24-pins, it will work with this system. If not, the system may still work, but experimentation is really the only guide.
+Finally, a mouse is recommended for use with the software, as  the 'Zoom' option cannot be used without one. However, the rest of the program will work well with either keys or mouse.
+(A Microsoft-compatible mouse is recommended, but other mice may work.)
+
+
+
+SETTING UP
+ 
+The software comes supplied on one floppy disk. It is advisable to make a back-up of this disk, in case it should become corrupt. 
+
+To make a copy of the disk, use the operating system 'copy' command. For example, if the original disk is in drive 'A', put the back-up disk in drive 'B' and use the command :
+
+	copy a:\grafplot.exe b:
+
+If you have only one drive, use the same command, and you will be prompted to swap disks as necessary.
+
+The system can of course be run from a hard disk. To transfer it to the hard disk, use the 'copy' command as explained above, except that the 'b:' parameter must be changed to the letter for your hard drive (usually 'c:'). The system can then be run from the hard disk, and the original floppy kept as a back-up.
+The software is now ready to be set in motion. To start it up, go to the drive on which the program is stored. If you are running it from a floppy, insert the correct disk. 
+
+Now type 
+
+	grafplot
+
+and press the <return> key.
+
+If all is well, a message should appear asking for the type of display you wish to use. 
+
+If you have an EGA display, press 'e' and then the <return> key. If you have a VGA display, press either 'e' or 'v', depending on whether you wish to run the program in EGA or VGA mode, followed by the <return> key.
+
+If you do not have the required graphics hardware, an error message to that effect will be produced, and you will be returned to DOS. 
+
+If you do have the required graphics hardware, the program should begin. The screen will be cleared, and a set of menus presented, as shown overleaf.
+
+You are now ready to start creating graphs!
+USING THE MENU SYSTEM
+
+Grafplot uses a pop-up menu system, which is both quick and easy to master.
+
+When the program is started up, you are presented with a set of six menu headings along the top of the screen. You should also see the mouse pointer somewhere on the screen, if you have a mouse installed.
+
+There are two ways of selecting a menu. The first is by typing the appropriate key sequence. This involves pressing and holding down the CTRL key and then pressing the key for the first letter of the menu you wish to select. For example, if you want to select the FILE menu, press CTRL-F (and then release both keys).
+
+The second method can be used if you have a mouse installed. Simply move the mouse pointer over the menu heading you wish to select, and press the left mouse button.
+
+Each menu consists of a number of different options. They are written in blue, with one letter highlighted in red. These options can again be chosen by either the keyboard or mouse. 
+
+To choose an option using the keys, simply press the key representing the letter which is highlighted in red. For example, if you have chosen the FILE menu, and wish to pick the 'Load' option, pressing the 'L' key will choose that option (the 'L' is highlighted in red). To choose an option using the mouse, simply move the mouse pointer over the option required, and press the left mouse button.
+
+What happens next obviously depends on the option you have chosen. However, unless you have decided to quit, you will always be returned to the menu system when the operation has been completed. You are then free to choose another option from any of the menus.
+
+
+CREATING A GRAPH
+
+
+Having set up the system, and learned how to use the menus, you are now in a position to create an actual graph.
+
+The first thing to do is select the graph menu. A menu should appear below the GRAPH heading, with five options.
+
+Choose the 'New graph' option. The menu will disappear, and a window will be produced, asking you to enter a formula.
+
+We will use 'y=sinx' as the formula for this example. Enter this formula and press the return key. If you mistype part of it, use the delete key to correct it.
+
+If you mistype part of the formula, but do not notice, and you press the return key, a suitable error message will be displayed. Press any key to remove the error message, and you will invited to enter the formula again.
+
+When the formula has been entered correctly, another window will be displayed, asking you to enter the minimum x-coordinate. For this example, type 0 (and press return). You will now be asked for the maximum x-coordinate. Enter the number 1000.
+
+If either of numbers you typed were not valid, e.g. you accidently typed an alphabetic character in one of the numbers, an error message will be produced. 
+As always, press any key to carry on. The error message will be removed, and you will be invited to re-enter the coordinates.
+
+When the x-coordinates have been entered correctly, yet another window will appear, this time asking for the minimum and maximum y-coordinates. These are entered in exactly the same way as the x-coordinates. Enter the values -1.2 and 1.2 respectively.
+
+Assuming that the y-coordinates are entered correctly, the graph should now be drawn on the screen. Your display should look like that overleaf.
+Your first graph has now been created! The procedures described above should have demonstrated how to use the menu system, and how to input basic information about the graph you wish to be drawn.
+
+But this is only the beginning! There are numerous other options which can be used to change the parameters of the graph, print the graph, save the graph to disk, zoom in on specific areas of the graph, change the accuracy of the graph, and many more. These options will all now be explained. It will be assumed that you are familiar with the menu system, and the method of inputting information when prompted by the program.
+
+First of all, I will explain the purpose of the other options on the GRAPH menu.
+
+
+
+GRAPH MENU
+
+The 'New graph' option on this menu has already been explained. It is always the one to use if you wish to create a totally new graph.
+
+However, when you have created a graph using this option, you may wish to change only one or two if its parameters. For example, you may want to change the y-axis. 
+
+You could, of course, use the 'New graph' option, and simply type in all the parameters again, including the new y-coordinates. However, there is a better way. 
+
+If you wish to change the y-coordinates, simply choose the 'New y-axis' option. A window will appear, prompting you for the new minimum and maximum y-coordinates. When these are entered, the graph will be redrawn using the new y-coordinates and the previously defined formula and x-coordinates. This saves the time and effort of repeating the information you wish to stay the same.
+
+The other options on this menu are in the same vein. If you wish to change only the formula, leaving the axes as they are, use the 'New formula' option.
+
+If you want to change only the x-axis, use the 'New x-axis' option.
+
+Finally, if you want to change both the x- and y-axes, but not the formula, use the 'New xy-axes' option.
+
+In each case, data is entered in the same way as you would when using the 'New graph' option.
+
+Now, what about saving your graph to disk ?
+
+
+FILE MENU
+
+This menu is used to access the file-handling procedures of the program. In other words, you will use this menu to save and load graphs to/from disk.
+
+First of all, the options for saving a graph to disk.
+
+There are two options concerned with storing a graph on disk. They are 'Save as...' and 'Save'.
+
+When the 'Save as...' option is used, the program will ask you for the name of the file that you wish to store the graph in.
+
+However, if Grafplot already knows the name of the file, i.e. you have previously saved it or have loaded it from disk, you can use the 'Save' option. This option will save the file under the name it used before, without you having to re-type it.
+
+
+Save as...
+
+When you choose the 'Save as...' command, a window summarising the data you are about to save will appear , followed by another window asking for the name under which you wish to save the graph. You can either just enter a name such as 'sine.gra', which will be saved on the drive and directory that you started Grafplot from. 
+Alternatively, you can specify a new drive and directory for the file, e.g. 'c:\graph\sine.gra', which would save the file in the 'graph' subdirectory of the 'c' drive.
+
+When the file name has been entered, Grafplot looks for it on the disk. If a file of the same name already exists, you will be warned of this, and invited to terminate the 'save' operation. 
+
+If all is well, the file is then saved on the disk, and a message will appear when the save is finished, confirming that the operation has been successful.
+
+If the name of the file or its drive or directory are invalid, an error message will be produced.
+
+
+Save
+
+The 'save' option is used, as already mentioned, when Grafplot already knows (from a previous file-handling operation) the name of the file to be saved.
+
+If this option is chosen, but Grafplot does not know the name of the file, the 'Save as...' procedure is invoked.
+
+If Grafplot does know the file name, the window summarising the data about to be saved will again be produced. However, instead of asking you the name of the file to be saved, the program will display the name that it thinks you want to use, and ask you to confirm that you want to save using this name. 
+
+If you want to use this name, press 'y' (for yes), and the file will be saved. If you do not want to use this name, press 'n'. You will be returned to the menu system, from which you can choose the 'Save as...' option.
+
+
+Load
+
+This option is used when you want to load a graph from disk, which you have previously saved.
+
+When you choose this option, the program first checks to see if any data will be lost if you load a new graph. If there is a graph currently in memory which has not been saved, you will be warned of this, and invited to terminate the loading process.
+
+A window is now displayed, asking you to enter the name and path (drive and directory) of the file you wish to load.
+
+Grafplot will look for the file on the disk. If it is not found, or when found turns out be corrupt, an error message will be produced. Otherwise the file is loaded, and the graph immediately drawn on the screen.
+
+You are then free to view, alter, print the graph etc., just as if you had created it from scratch.
+
+
+PRINT MENU
+
+This menu contains the commands used to print the graph on a dot-matrix printer. 
+
+There are only two commands. The first, 'Print 24-pin' is used to print the graph on a 24-pin printer, e.g. the EPSON LQ-800, while the 'Print 9-pin' option is used for 9-pin printers such as the EPSON LX-800.
+
+When either of these options is chosen, the program checks that the printer is ready to receive data. If it is not, an error message is produced. 
+
+If you encounter this message, make sure that the printer is switched on, is on-line, is not out of paper, and is properly connected to the computer, and then try again.
+
+If the printer is ready, a message informing you that printing is in progress is displayed at the top of the screen. This will remain until the printing has finished. However, you can terminate the process prematurely if you wish by pressing the 'q' key. This will return you to the menu system.
+
+The print-out produced by Grafplot depends on the way the system is set up. All print-outs are around eight inches wide, but the height depends on the type of screen display and type of printer used. 
+
+If your graphs are not being printed properly, find out if the printer is fully EPSON compatible. If it is, then make sure that all connections from the computer to the printer are good. If all else fails, try the program on a system with a different printer, to find out if the fault lies with the software or the hardware.
+
+A printout from a VGA system with a 24-pin printer should look this :
+
+
+OPTIONS MENU
+
+This menu is used to alter some of the default parameters associated with a graph, and then redraw the graph.
+
+There are four options on the menu.
+
+
+Speed
+
+This option is used to change the speed at which the graph is drawn. 
+
+The speed of the graph is a whole number between one and ten, and is five when the program begins.
+
+It governs how quickly, and therefore how accurately, the graph is to be plotted.
+
+The lower the speed, the more accurately the graph is drawn, but the longer it will take. 
+
+For many graphs, the accuracy does not make much difference, e.g. linear graphs, therefore the speed can be raised. However, some complex graphs may need the extra accuracy to give a good representation, and therefore speed will have to be sacrificed.
+
+This speed/accuracy compromise is left up to you, but a good starting point is the default speed, five. If this proves to be too inaccurate, you can lower the speed and redraw the graph. On the other hand, if the graph you have created is not exactly the one you want, you have not wasted much time by drawing it.
+
+As with the system as a whole, experimentation is the best way of learning about how best to use this option.
+
+
+Radians/Degrees
+
+This option will either be 'Degrees' or 'Radians', depending on which is in current use.
+
+The default type of angle measure is degrees, therefore this option starts out as 'Radians'. However, if you choose this option, the graphs will be drawn in radians, and the menu option will become 'Degrees', thus allowing you to switch from one to the other.
+
+
+This parameter is obviously only relevant when using trigonometric functions, but the program does not stop you from changing it at other times.
+
+
+Grid on/Grid off
+
+This option is used to turn on and off the grid which is in displayed underneath the graph. The grid is on when the program first starts, but if you wish to display graphs with a plain background, you can use this option to turn the grid off. 
+
+As with the previous option, this option changes depending on the value of the parameter at that time. 
+
+If the grid is currently on, as when the program first starts, this option will be 'Grid off', this allowing you to turn the grid off, and vice versa.
+
+The grid often helps in reading coordinates off the graph, but it can sometimes make the screen untidy if complex functions are being plotted.
+
+
+Redraw
+
+None of the three options above have any immediate effect. They only alter the parameters used for the next graph to be drawn. This allows you to change more than one option without having to wait for the graph to redrawn each time.
+
+You can therefore use this option to redraw the graph with the new parameters in place.
+If, for example, you have drawn a graph that is too inaccurate, you would lower the speed using the 'Speed' option, then choose the 'Redraw' option to redraw the graph at this new speed.
+
+Of course you may wish to use some of the options on the GRAPH menu after using the options on this menu, in which case this option is unnecessary, as those options automatically redraw the graph, but the facility is there if you need it.
+
+
+ZOOM MENU
+
+This menu contains three options, each dealing with the process of zooming in on a specific area of a graph.
+
+The menu is only operational if a mouse has been installed, otherwise an error message is produced when you try to access it.
+
+
+Zoom in
+
+This option allows you to zoom in on a rectangular area of the graph which you define using the mouse.
+
+When you pick this option, the mouse pointer will be reset to the centre of the screen.
+
+You should move the pointer to one corner of the rectangle which you are going to define. Press the left mouse button and hold it down. Now move the mouse pointer to the other corner of the rectangle. You should see a red rectangle being drawn between the point where you first pressed the mouse button, and the point where the pointer is now. Release the mouse button, and the new graph should be drawn immediately.
+
+If, in the process of defining the rectangle, you want to abort the process, try to make the rectangle as thin as possible. When the red lines have disappeared completely, release the mouse button, and you will be returned to the menu system.
+
+The process is also aborted if you choose the 'Zoom in' option and then press the mouse button outside the area of the graph.
+
+If you try to pull the rectangle outside the area of the graph, the rectangle will only extend to the extremes of this area. This is a good way of making sure that one edge of your rectangle is along one of the axes, if that is what you require.
+
+You can use as many consecutive 'Zoom in' operations as you want, but only the first twenty will be stored for 'Zoom out' purposes. When you have zoomed in twenty times, you will be warned that any further zooms will not be recorded. Thus if you zoom in thirty times, and then select the 'Zoom out' option, you will go back to the twentieth graph.
+Finally, the 'Zoom in' option is not designed to provide a very accurate way of defining areas of the graph, but more of a rough way of getting the general area of the graph you desire. To get precise areas of the graph drawn, use the options on the GRAPH menu.
+
+
+Zoom out
+
+This option is used to zoom out, after at least one 'Zoom in' operation.
+
+When you perform a 'Zoom in' operation, the parameters of the current graph are stored, to enable you to zoom out again. There is space for up to twenty graphs to be stored. You can therefore 'Zoom in' twenty times, and still return to original graph, or any of the graphs in between.
+
+
+Clear
+
+This option is used to clear the memory of the graphs which have been produced by 'Zoom in' operations.
+
+Suppose, for example, that you have zoomed in about fifteen times. You know that you want the next ten graphs to be stored so that you will be able to zoom out through them again, but equally you know that only about five more graphs can be stored.
+The answer is to select the 'Clear' option. This wipes all the graphs currently in memory, so the fifteen graphs already defined will be lost. However, the system has been reset, so the next ten graphs can be stored and retrieved with no problems. (Up to twenty, of course, could be stored and retrieved)
+
+
+QUIT MENU
+
+This menu is used to quit from the program, and return to the DOS command line.
+
+There are just two options, 'Sure - Yes' and 'No'.
+
+If you choose the quit menu, and then change your mind above quitting, or if you chose the quit menu by mistake, pick the 'NO' option. This will return you to the menu system.
+
+If you still want to quit, choose the 'Sure - Yes' option. 
+
+If there is a graph in memory which has not yet been saved, you will be warned that this data will be lost if you quit, and you will be invited to return to the menu system.
+
+If you still want to quit, or if there was no graph in memory which had not been saved, the program will terminate and you will be put back to the DOS command line.
+
+WHAT KIND OF GRAPHS CAN I DRAW ?
+
+So far I have explained the basics of how each command is used.
+
+However, I have not discussed in detail all the types of graph that can be created with the system.
+
+The software was designed to be flexible, and this is apparent in the huge range of different types of graphs that can be drawn.
+
+Basically, it is true to say that the program will accept any mathematically correct formula which uses standard notation. In most cases, it is simply a matter of copying straight from the type of formula you might write on a page.
+
+Of course this general statement must be qualified by stating exactly what the program will accept.
+
+Operators :
+
+First of all, any of the four standard operators are accepted, i.e. multiply, divide, add, and subtract. The only difference between their use here and that on a page is that the symbols used to represent multiply and divide are slightly different. You must use '*' for multiply, and '/' for divide. Addition, '+', and subtraction, '-', are as normal.
+
+There is also a fifth operator in my system. Where you would usually write 'xy', the program uses 'x^y', i.e. the fifth operator is 'to the power of'.
+
+Normal priority is used. '^' comes first, followed by '*' and '/' with equal priorities, and then '+' and '-', again with equal priorities. When two operators have equal priorities in a formula, they are evaluated from left to right, as usual.
+
+Functions :
+
+A wide range of mathematical functions are supported including trigonometric, hyperbolic, and logarithmic ones. 
+
+The functions supported are :
+
+	sin			(sine)
+	cos			(cosine)
+	tan			(tangent)
+	asin			(inverse sine)
+	acos			(inverse cosine)
+	atan			(inverse tangent)
+	sinh			(hyperbolic sine)
+	cosh			(hyperbolic cosine)
+	tanh			(hyperbolic tangent)
+	log			(logarithm base 10)
+	ln			(logarithm base e)
+	exp			(exponential)
+	sqrt			(square root)
+	abs			(absolute or modulus)
+These functions can be combined at will with the other elements which go to make up a formula. Some example formulae might be  'y=3*sin(x/2)' or 'y=exp(sinhx(cosx))' or simply 'y=lnx'.
+
+Parentheses :
+
+Parentheses, or brackets, can be used at will in any formula, to change priorities, or just to clarify the formula.
+
+Implied Multiply :
+
+When you write down a formula on paper, you often leave out a multiply sign, i.e. the multiply operator is implied.
+
+This works in the same way with Grafplot. For example, instead of typing 'y=3*sinx', you can use 'y=3sinx'. 
+
+Similarly the '*' can be left out between two sets of brackets, e.g. 'y=(x+3)(x+5)', or between an 'x' and a set of brackets, e.g. 'y=x(x-4)'.
+
+Implied Zero :
+
+You often write a number such as '0.54' as '.54'. This is will also work with Grafplot. For example, 'y=.23*.085' works just as well as 'y=0.23*0.085'.
+
+Length :
+
+Grafplot allows formulae up to fifty characters long. In the unlikely event if you having a formulae longer than this, try to simplify it using implied multiplies and implied zeros, and eliminating unnecessary brackets.
+
+Range and Accuracy :
+
+Grafplot can deal with numbers in the range +/- 99,999,999, with up to ten significant figures/eight decimal places. 
+
+If you try to use numbers outside this range, you will be warned by the software.
+
+Syntax Errors :
+
+If you mistype part of the formula and thus enter a formula which is not a valid mathematical expression, a suitable error message pointing out the problem will be produced, and you will be invited to re-enter the formula.
+
+Mathematical Errors :
+
+Sometimes a formula can produce mathematical errors. These are often unexpected.
+
+For example, the formula 'y=1/x', will work perfectly on any x-coordinate apart from zero. 
+When the program reaches a point which it cannot calculate such as the one above, it pauses and tells you of its difficulty. 
+
+You are then asked if you wish to skip this point and carry on with the graph. If you reply 'Y' (yes), the program will try to calculate the next point, and carry on from there. If you reply 'N' (no), the graph is aborted and you are returned to the menu system.
+
+Other examples of possible mathematical errors are trying to take the logarithm of a number less than or equal to zero, or trying to take the inverse sine or inverse cosine of a number outside the range -1 to 1, or taking the square root of a number less than zero.
+
+Fatal Errors :
+
+These are errors which are fatal to the drawing of the graph. (Not to the complete system!)
+
+There are only three examples you are likely to encounter. 
+
+The first occurs when the calculations get too large for the software to handle, e.g. 'y=2^10000'
+
+The second occurs when the calculations become too small to deal with, e.g. 'y=2^-10000'
+
+The third is a less common one. It occurs if a loss of significance occurs. This only happens in special cases such as 'sin(10^70)'. The operand, '10^70' is small enough to deal with, but to calculate the sine of this would be too much for the software to handle.
+
+In each of these cases, an error message is produced, the graph is aborted, and you will be returned to the menu system.
+
+
+Overall, the system is extremely flexible in what it will accept as a formula. If you are not sure about a formula, try it and see. If it is not valid, Grafplot will tell you, and you can try entering it in another form.
+
+
+ERROR MESSAGES 
+
+There are numerous error messages which you might encounter while using the system. They are all listed here, along with their most likely cause.
+
+File-handling
+
+ 'The file cannot be found using the requested path'
+
+ The file you specified for a load operation cannot be found.
+ If the file name and path have been typed correctly, the 
+ file either does not exist at all (it has been deleted), or 
+ it is held in another drive or directory. (Perhaps you are 
+ using the wrong floppy disk.)
+
+ 'The data in the requested file cannot be loaded'
+
+ The file has been found, but it has either become corrupt, or
+ it is not a valid Grafplot file.
+
+ 'A graph has not yet been defined. Select 'New graph' option'
+
+ You have selected one of the save options, but there is no
+ graph to save!
+
+ 'Unable to save data using requested path'
+
+ The file name and path that you have specified is not valid, 
+ e.g. 'd:\sine.gra', where the 'd' drive does not exist.
+Graph drawing
+
+
+ 'A graph has not yet been defined. Select 'New graph' option'
+
+ You have selected a menu option such as 'New formula', but 
+ you have not defined a graph with the 'New graph' option
+ yet. 
+ There is therefore no old data to use the new formula with.
+
+
+ 'The minimum and maximum x-values cannot be equal'
+
+ The minimum and maximum x-coordinates that you entered were
+ exactly the same. 
+ Clearly this is impossible.
+
+
+ 'The minimum and maximum y-values cannot be equal'
+
+ See previous error.
+
+ 
+ 'Please use values in the range +/- 99,999,999'
+
+ You have used values for the coordinates outside the possible
+ range.
+
+ 
+ 'The graph cannot be drawn to this accuracy'
+
+ You have used minimum and maximum coordinates that are so
+ close that the software cannot handle the accuracy required
+ to draw the graph.
+
+
+ 'One of the x-coordinates was not a valid number'
+
+ On of the x-coordinates that you entered was not a valid 
+ number, e.g. it contained an alphabetic character, or
+ two decimal points etc..
+
+
+ 'One of the y-coordinates was not a valid number'
+
+ See previous error.
+
+
+ 'There is an unknown function in the formula'
+
+ You have used a function in the formula which is not recog-
+ nised by the program, e.g. 'y=fred(x)'
+
+
+ 'There is an error in the syntax of the formula'
+
+ There is a general error in the syntax of the formula, e.g.
+ two adjacent operators or an operator with only one operand.
+ 'Please type in the formula to be plotted'
+
+ When asked for the formula, you pressed the return key. You
+ must enter a formula.
+
+
+ 'Invalid character 'X' found in formula'
+
+ The invalid character specified by 'X' was found in the 
+ formula. You must not use this character in formulae.
+
+
+ 'There are two adjacent decimal points'
+
+ Self-explanatory.
+
+
+ 'An overflow error has occurred, e.g. 2^10000'
+
+ Self-explanatory.
+
+
+ 'An underflow error has occurred, e.g. 2^-10000'
+ 
+ Self-explanatory.
+
+
+ 'A Loss of Significant Digits has occurred, e.g. sin(10^70)'
+
+ Self-explanatory.
+ 'Invalid Speed. Use a value from 1 to 10.'
+
+ When prompted for a new speed, you did not enter a value
+ from one to ten.
+
+
+ZOOMING
+
+ 'The graph cannot be drawn to this accuracy'
+
+ The rectangle you drew defined an area too small to be
+ drawn.
+
+
+ 'The zoom function cannot be used without a mouse.'
+
+ You selected the 'Zoom' menu on a system without a mouse.
+
+
+PRINTING
+
+ 'There is a fault with the printer.'
+
+ You have selected one of the print options, but the printer
+ is not ready to receive data. This might be due to one of
+ several reasons. The printer could be switched off, off-line,
+ out of paper, or disconnected from the computer. Correct the
+ fault, and try again.
+

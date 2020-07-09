@@ -1,0 +1,359 @@
+ANALYSIS
+
+
+
+
+PROBLEM DEFINITION
+
+
+Basically, my problem is to replace the conventional pen and paper method of producing graphs of mathematical formulae, by a more accurate and efficient computer-based system.
+
+
+The formulae are of the type 'y=f(x)', but within this restriction can be in various forms, e.g. polynomial, trigonometric, logarithmic etc., or even a combination of these types.
+
+
+The system will be aimed at the education market, where the production of such graphs is a large part of both GCSE and 'A'-level mathematics courses, and where a project of this nature could be used as a teaching aid, and thus be a stimulus for learning.
+Probably the easiest way to illustrate the problem outlined on the previous page is by an example. 
+
+Suppose we wish to create a graphical representation of the formula 'y=x+4', in the range from x=0 to x=10. This formula is one of the most simple types of the form y=f(x), and the values of y are easily calculated from those of x. For example, if x has the value 2, then y has the value 2+4, i.e. 6. Thus, one coordinate on the graph is (2,6). ( The x-coordinates are plotted horizontally, and the y-coordinates vertically. ) 
+
+So, to produce the graph required, we can simply calculate the y-coordinates corresponding to some x-coordinates in the range 0 to 10, and join up the resulting points. A table can be drawn up to show the coordinates that will need to be plotted:
+
+			X		Y		Coordinates
+		
+			0	   0+4=4		  (0,4)
+			2	   2+4=6		  (2,6)
+			4	   4+4=8		  (4,8)
+			6	   6+4=10		  (6,10)
+			8	   8+4=12		  (8,12)
+			10	   10+4=14	  (10,14) 
+
+These coordinates are now plotted on a coordinate diagram and joined up to form the graphical representation of the formula.
+This graph is an excellent representation of the formula 'y=x+4', and it was reasonably simple to produce, so where is the problem ?
+
+The problem is that this process is only useful for extremely simple formulae like that used in this example. While it is true that for the formula 'y=x+4', the computer could not do a much better job than conventional methods, this cannot be said of the majority of the infinite number of different formulae we might wish to plot.
+
+Let's take as another example, the formula 'y=sin(x)', in the range x=0 to x=1000 ( where x is measured in degrees ), and use the same process as in the previous example :
+
+	X	    Y (2 dec. places )		 Coordinates
+
+	0			0.00				(0,     0.00 )
+	200		    -0.34				(200,  -0.34 )
+	400		     0.64				(400,   0.64 )
+	600		    -0.87				(600,  -0.87 )
+	800 			0.98				(800,   0.98 )
+	1000		    -0.98				(1000, -0.98 )	
+
+
+The graph on the next page shows these coordinates plotted on a coordinate diagram.
+Clearly, there is a large discrepancy between the graph I plotted and the actual graph. This is due, of course, to the lack of coordinates plotted. In the case of a sine curve, six coordinates is insufficient to give a reasonable representation in the range defined. In fact, because of the constantly varying nature of this type of curve, a large number of points, perhaps dozens, would have to be plotted to produce acceptable results. Obviously the prospect of calculating and plotting points on this scale is too long and tedious to consider. So what is the answer ?
+
+There are two possibilities. Either,  (a) find a new, more efficient procedure for drawing graphs, rather than the crude point-plotting method already described, or  (b) find some way of automating the process previously described to speed it up.
+
+Method (a) is in fact the conventional method of sketching difficult functions such as sine curves. Instead of plotting a series of points and joining them up, special points are found such as the points where the graph cuts the axes, or where the gradient of the graph changes sign. This method can produce quite good results, in a reasonable time. However, it has one major drawback. It involves complicated mathematical techniques such as differentiation which, for all but the simplest of formulae, require a detailed knowledge of advanced mathematics. Even at 'A'-level, there are a limited number of formulae which can be manipulated in this way.
+Evidently, method (b) is the only viable option. But how do we automate the point-plotting process? Easy - use a computer. Because of the sheer speed at which modern computers can process mathematical calculations, large numbers of coordinates can be produced in a relatively short time, and with the aid of high-resolution displays and dot-matrix printers, it should be possible to produce high-quality, accurate graphical representations of any formula required.
+
+And speed and accuracy are not the only possible benefits of computerisation. The interactive nature of a computer system should allow the manipulation of data in a way not considered using pen and paper methods. For example, the user could 'zoom in' on areas of the graph which were of particular interest, simply by instructing the computer to redraw the graph using different axes. The exact representation that the user is looking for could thus be found on-screen before committing the graph to print, instead of the guess-work involved in the selection of scales using traditional methods.
+
+Obviously, in theory, computerising this system seems a good idea and would not only be more efficient than the existing system, but would bring added benefits due to the increased flexibility. But is the system practical to implement? To answer this question, a more detailed list of user requirements is needed.
+USER REQUIREMENTS
+
+
+SOFTWARE
+
+There are a number of attributes which the software of this system must possess.
+
+The first thing to consider is the skills of the proposed users. The system is aimed at the educational market, i.e. teachers and students, and as such, we can safely assume that they are fairly knowledgeable about basic mathematical notation, symbols etc.. However, we cannot assume that their knowledge of computer fundamentals is so comprehensive. Indeed, many potential users may not have used a computer at all. Because of this, a user-friendly system must be constructed. Obviously, the component which brings most influence to bear on this aspect of the system is the user interface. 
+
+A friendly user interface will do much to encourage use of the system, as it will help to disguise the low-level operations of the computer, and thus stop potential users being discouraged by their lack of comprehension of how computers work. Indeed, the extra effort involved in providing a friendly user interface will be appreciated by any user of the system, regardless of how experienced they are in the field of computers. 
+
+Obviously, the degree of control which can be exercised over the quality of the user interface depends on the proportion of the software which is custom-written. If the whole package is custom-written, the requirements for a user-friendly interface can be included in the program specifications. If, however, a standard package is used to solve the problem, very little can be done about the user interface, and thus care must be taken when choosing the software, to make sure that the interface fulfils the requirements.
+
+
+The problem of the user interface is one which is common to almost all computer systems, but there are much more specific requirements which must be fulfilled in order to solve this particular problem.
+
+By definition, the software will need to be capable of generating graphs of a wide range of both simple and complex formulae. The first problem which arises is in trying to turn a formula which the user understands, e.g. 'y=3(sin(x/4))', into a form which the computer can understand, and thus calculate coordinates from. This is a considerable problem. To what extent can we expect the user to go 'down' to meet the needs of the computer. The obvious answer is to say that the user should not have to go 'down' at all, but the program should 'come up'. In other words, the user should be able to enter the formula in the form 'y=3(sin(x/4))' directly, without having to modify it. This is a fairly difficult proposition, as every possible form of input must be considered. 
+In fact, there are an infinite number of connotations of formulae in this form, as any one formula can include any number of floating-point numbers, operators, functions, parentheses, variables etc., in any order. 
+
+To simplify the system, there are a couple of options which may be considered. First, and most simply, a menu system could be used, whereby the user picks from a set range of formulae, and that formula is plotted. However, inevitably such a system is extremely limited, as only a tiny subset of all possible formulae could be included. This is the least desirable of the options. There is another option, which lies somewhere between the two previous options, in both flexibility and ease of implementation. It would be to set up a system which accepted formulae typed in, as in the original method, but only in a certain pre-determined pattern. For example, a quadratic function could be entered as y=ax2+bx+c, but not as (x-a)(x+b) or x(ax+b)+c. This system would be useful, but far from ideal.
+
+Once again, as for the user interface, the choice between custom-written and package-based software will dictate to a large degree which of the three methods can be used. If software is custom-written, difficulty of implementation must be weighed up against flexibility of the resulting system when deciding on the method. I would suggest at this stage that the first, most flexible method is by far the most desirable, and should if at all possible be implemented. 
+If the software is package-based, the flexibility of formulae which can be entered must be a major consideration in the choice of software to be purchased, if indeed suitable software is available. 
+
+It is plain, however, that for either package-based or custom-written, the more flexible the better.
+
+(For the purposes of the rest of the analysis, I will assume that the first method described can be implemented. If this assumption proves to be incorrect, the software requirements about to be stated may have to be scaled down to meet the more restrictive system which would have to be produced.)
+
+The following is a list of the requirements of the system that I would like to see included in the final implementation :
+
+
+ Operators :   +   (Addition)
+			-   (Subtraction)
+			x   (Multiplication)
+			/   (Division)
+			^   ('To the power of')
+
+ Functions :   sine
+			cosine
+			tangent
+			
+			(continued over...)	
+ Functions : 	inverse sine
+  (cont.)		inverse cosine
+			inverse tangent
+			hyperbolic sine    (sinh)
+			hyperbolic cosine  (cosh)
+			hyperbolic tangent (tanh)
+			logarithm ( base 10 and base e )
+			absolute  ( value of number discarding sign )
+			square root
+			exponential ( e^x )
+
+ Parentheses : 
+
+ Parentheses, or brackets, should be permitted, preferably up 
+ to at least six levels.
+
+
+ Priority : 
+
+ Obviously, priority must be catered for, e.g. 3+4*6 must be 
+ translated as 3+(4*6), not (3+4)*6.
+
+
+ Length : 
+
+ Any formula entered would not be expected to exceed thirty 
+ characters. I would suggest a maximum workable limit of 
+ around fifty characters would be appropriate.
+
+
+ Combination : 
+
+ Ideally, any combination of functions, operators etc. should 
+ be catered for, e.g. y=3*sin(x/(1+log(x))).
+
+ Range : 
+
+ As the system is aimed at education, as opposed to scientific 
+ or engineering use, reasonable, rather than exceptional, 
+ range and accuracy need to be included. I would suggest, from 
+ my own experience of 'A'-level Mathematics and Further 
+ Mathematics, that a range of +/- 99,999,999 would be more 
+ than adequate. Indeed, for most educational use, +/- 1000 
+ will not be breached. 
+
+ I feel eight decimal places would be equally sufficient, with  
+ around ten significant figures.
+
+ Speed  : 
+
+ Speed is a major consideration when implementing the system. 
+ The software must be fast enough to allow interaction between 
+ the user and the program, e.g. a user may want to see a 
+ function at various ranges of x-coordinates and if a 
+ considerable wait is involved every time a new graph is 
+ required, user frustration and dissatisfaction will 
+ inevitably build. I would suggest a time limit of around one 
+ minute per graph, with an aim of producing simple graphs in a 
+ much shorter time, i.e. a few seconds. 
+
+ The time taken to draw a graph will obviously depend on the 
+ method used to interpret the formula, and it should be noted 
+ that the more flexible the parser, the slower the 
+ interpretive process is likely to be. 
+
+ This flexibility/speed compromise must be balanced evenly, 
+ with, of course, the central aim being to provide a system 
+ which is both fast and flexible.
+
+ 
+ 
+ (Note : The times quoted refer to on-screen output. Hard-
+  copy, i.e. print-outs, would be expected to be much slower, 
+  but obviously the speed in this case is more to do with the 
+  hardware, i.e. the printer, than the software)
+
+
+
+
+
+This concludes the basic requirements for the software. 
+
+The hardware on which the software will run will now be considered.
+HARDWARE
+
+Having considered the software, it is necessary to find the hardware which will meet both the needs of the software, and coincide with the resources of the potential users.
+
+As the system is aimed at the education market, the computing resources available within educational establishments (schools, colleges etc.) must be considered. 
+
+These are generally of two types. The BBC Micro and the IBM PC compatible. (There are other computers used, but they are by far in the minority, and therefore not worth considering.)
+
+
+BBC Micro
+
+The BBC has been the mainstay of computer education in schools and colleges in the UK since the early eighties, and still enjoys a large share of the market. 
+
+When first introduced in 1982, it was highly acclaimed for its speed, ease of operation, good version of BASIC, and expandability. These qualities have helped it maintain its prominence in education circles, despite the general improvement in the meantime in the power of micros. The specifications of the BBC B, the model most commonly found, are given overleaf.
+Processor : 
+
+Motorolla's 6502 processor. It is reasonably efficient for an 8-bit processor.
+
+Memory : 
+
+The BBC B comes with 32K of RAM (Random Access Memory). This is adequate rather than ample, but would suffice for many text-based applications. Unfortunately, the 32K includes the screen memory, and if high-resolution graphics are used, as little as around 10K may be left for the actual program. This must be a major consideration, as by definition, my system will require extensive graphics work.
+
+Graphics : 
+
+The BBC offers fairly extensive graphics facilities compared to other 8-bit micros. The resolution/colours vary from a 640x256 2-colour mode, to a 160x256 16-colour mode.
+
+Printers : 
+
+There is a wide range of printers available. The most commonly found type is the 9-pin dot-matrix type, such as the EPSON LX–800.
+Programming : 
+
+
+The BBC comes supplied with its own dialect of BASIC. It is a relatively good implementation of the language, and compares favourably with other interpreted versions. However, it suffers from the problem that all interpreted languages, as opposed to compiled ones, suffer from - lack of speed. 
+
+In recognition of this, the BBC actually has its own assembler built into ROM. This is an unusual, but nonetheless welcome addition to the system. Assembly language is extremely fast, but of course is much more difficult to program in than BASIC.
+
+There are other, fairly rare languages available for the BBC. For example, a COMAL chip is available. COMAL is really just a more structured form of BASIC and as such is not, in my view, a significant improvement over the supplied language. It is certainly no better as far as management of resources or speed is concerned. 
+
+Compiled languages, such as Pascal and C are not, to my knowledge, generally available on the BBC. This is probably due to the lack of memory, as compilers are fairly memory-hungry pieces of software. This is a major black mark against the BBC, as compiled programs have a great speed advantage over interpreted ones.
+
+
+Overall, the BBC B is a fair all-round machine, its greatest problems being its lack of memory, especially when graphics are used, and its lack of a compiled language.
+
+
+IBM PC
+
+The IBM PC was launched in 1980, and since then sales of it, and its compatible machines, have soared. It is now the most popular computer in the world, by a very long way. However, it is only recently that educational establishments have begun to show an interest in it as an educational tool. This is due mainly to the significant price reductions which have occurred lately, and the desire for students to gain experience on computers which are common in the business world, rather than those largely restricted to educational circles, such as the BBC. There is now a gradual conversion from the BBCs to the PCs in education, and I can only see this trend continuing.
+
+One of the attractive features of the PC is the large range of machines available. There are a number of different processors, memory sizes, graphics cards etc., which means that a buyer can choose a model according to his requirements and financial resources. Unfortunately, this large range makes it difficult to give the specification of a standard PC, as such a thing simply does not exist. However, I have listed the main differences in specification of different models, where these affect the choice of hardware for my system.
+
+
+Processors : 
+
+There are five main types of processors used in PCs today. They are the 8088, 8086, 80286, 80386, and 80486. They are given in order of speed, with the 8088 being the slowest. 
+
+There are other more subtle differences in power, apart from speed, including the size of memory which can be accessed, but these differences are not of any significance with regard to my system and do not merit further discussion.
+
+The most important point to make about these processors is that they are downwardly-compatible. This means that code written for an 8088 or 8086, which use identical instruction sets, will run without modification on any of the more powerful processors. However, code written specially for the faster processors will not necessarily work on the slower ones.
+
+Therefore, to produce code which will be compatible with the full range of PCs available, the instruction set of the 8088/8086 must be used.
+
+Memory : 
+
+Memory on the IBM PC is a complicated issue. However, for my requirements, there is no problem. Even the most basic modern PC will have at least 512K of RAM, more than enough for any system I am likely to implement.
+Graphics : 
+
+Graphical capability is another area of choice as far as PCs are concerned. Better standards have continually evolved over the years, and now it is just a matter of cost which is chosen. Any of the standards will work on any of the processors already mentioned.
+
+
+        CGA  : Colour Graphics Adaptor.
+			This is the first graphics standard developed
+			for the PC. (The original IBM PC had no high-
+			resolution graphics.) It is rather crude, with
+			a resolution of 320x200 in four colours.
+
+        EGA  : Enhanced Graphics Adaptor.
+			This is a significant improvement over CGA. It
+			has a resolution of 640x350, with sixteen 
+			colours, chosen from a palette of sixty-four, 
+			on-screen at any one time.
+
+        VGA  : Video Graphics Array.
+			Exceptionally good, for a micro. Resolution of
+			640x480, with sixteen colours, chosen from a 
+			palette of 262,144, on-screen at any one time.
+
+
+As for the processors, the graphics standards are downwardly-compatible, i.e. EGA supports CGA modes, and VGA supports EGA and CGA modes.
+Printers : 
+
+There is a huge range of printers available, from the most basic 9-pin dot-matrix, to high-quality laser ones.
+
+Programming : 
+
+Because of the PC's widespread use in business, the range of languages is almost never-ending. However, I have narrowed down the options to those which might be of use in my system.
+
+       BASIC : Several versions are available, in both 
+			interpreted and compiled versions. Interpreted
+			versions, such as Microsoft GW-BASIC, are very
+			slow on base-level PCs. Compilers, such as 
+			Microsoft QuickBasic, are faster, but produce
+			slow and bulky programs compared to other
+			language compilers.
+
+      Pascal : Several versions are available, the most 
+			popular being Borland's 'Turbo Pascal'. It is
+			in between BASIC and C as far as speed, program
+			size, and ease of use are concerned. Certainly 
+			a viable option.
+
+           C : C has become very popular on PCs due to the 
+			speed and compactness of the code produced, and
+			its low-level functions. However, its main
+			drawback is that it is fairly difficult to use.
+
+    Assembly : Obviously, there are several assemblers 
+			available, but this option must be considered
+			unnecessary for my system, with efficient 
+			compiled high-level languages available and
+			plenty of memory.
+
+
+
+
+
+Overall, the PC is a very capable machine, with ample power and resources. The only drawback, as far as my system is concerned, is that it is yet to have the penetration in the education market that the BBC has achieved.
+Custom-Written or Package-Based ?
+
+The software requirements and hardware resources have been stated. The next question is whether a suitable software package is generally available to comply with both of these specifications. The simple answer is 'NO'. Therefore, it appears that a program will have to be written.
+
+Having made this decision, the next step is to decide on the hardware on which to implement the system. The specifications of the two possible machines have been fully discussed. It is necessary to compare these specifications with actual hardware requirements which match the software requirements stated earlier. The general hardware requirements can be summarised as :
+
+ 1)  Reasonably fast processing. As a large number of
+	mathematical calculations and manipulation of high-
+	resolution graphics is required, overall processing
+	of a reasonable speed will be needed. 
+	(Overall processing includes not only raw processing
+	 power, but also language implementation used. )
+
+ 2)  Reasonable memory size. As has already been stated, 
+	the manipulation of large chunks of screen memory takes
+	its toll on memory resources. However, it is difficult to
+	say at this stage in precise terms how much memory will 
+	be needed.
+ 3)  High-resolution graphics. This is fairly obvious from the
+	problem definition. A graph-plotting system becomes 
+	inaccurate, and therefore ineffective, if coarse graphics
+	are used. I would suggest a resolution of at least 
+	500x200. A two-colour mode would be sufficient, but
+	obviously a multicolour system would be preferable.
+
+ 4)  Printer. Practically any modern dot-matrix printer, 
+	either 9-pin or 24-pin, would be sufficient, as even a 
+	9-pin printer provides better definition than a 
+	high-resolution screen display.
+
+
+The comparison between these requirements and the machine specifications given previously will help to decide on the machine required.
+
+First, processing speed. The actual processor speeds of the respective machines are not dissimilar. The 8086, despite being a 16-bit processor, is not significantly quicker than the 8-bit 6502. However, the PC wins easily over the BBC in terms of final program speed due to better language implementation. The BBC's interpreted BASIC simply cannot compete with compiled languages such as C and Pascal on the PC. 
+
+However, having said all that, the BBC would probably still be fast enough for my needs.
+
+Second, memory size. Obviously the PC has many times the memory of the BBC, but the question is whether or not the BBC's 32K would be sufficient. If the whole 32K were available for program use, I would probably say yes. However, as I will no doubt wish to use the highest, and therefore the most memory-hungry resolution, leaving only around 10K for the program, I would have serious doubts as to the possibility of squeezing the code in. I fear that inevitably the final implementation would be limited by this lack of memory.
+
+Thirdly, graphics. There is no doubt that either the EGA or VGA standards easily win over the BBC. But once again, the question is whether or not the BBC's graphics would be sufficient. In this case, I would say yes, although a two-colour mode would probably have to be used to obtain a high enough resolution. This is adequate rather than ideal, and I would certainly prefer to utilise the better capabilities of the PC.
+
+Finally, the printer. This is one area where the BBC competes  on equal terms with the PC, for my system requirements. In fact, both computers use the same 9-pin or 24-pin dot-matrix printers, either of which suit my application.
+
+To summarise, the PC seems to cover all hardware specifications ably. The BBC, however, has to struggle to fulfil even the basic requirements, and I could not be sure at this stage that the final implementation would not suffer as a result of this. The sensible option, therefore, seems to be the PC.
+Having decided on the PC as the only viable hardware option, the choice of programming language is left wide open. Any of the compiled languages suggested previously would do the job adequately. It is simply a question of personal choice.
+
+
+
+The analysis is thus concluded. Because of the restrictive nature of both the software and hardware requirements, many decisions have been made which would usually have been left to the design stage. However, none of the original objectives or aims have had to be altered along the way, and the restriction in the choice of system which the analysis has exposed will hopefully push the design process in the right direction.
+

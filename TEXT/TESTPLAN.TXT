@@ -1,0 +1,861 @@
+TESTPLAN
+
+
+This is the final part of the design. It will be used when the system has been coded and the program needs to be tested for bugs and flaws.
+
+
+There are certain fundamental operations of the system which must work before any other testing needs to be carried out.
+For example, when the user chooses which type of display to use, the program must either switch to that display mode, or (if the user's system does not support that mode) inform the user that he cannot use that mode. 
+
+Another example might be that the program must correctly display a menu which has been chosen by the user, and must allow him to choose whichever option from that menu that he desires.
+
+In reality, these basic operations are so fundamental to the system that they will have been fully tested while the program was being written. However, I have included them here for completeness.
+
+The testing which is more likely to show up bugs or incompleteness of implementation is that of the procedures which are accessed when any of the options from the various menus are chosen.
+To test that the functions accessed by any of the commands contained in the FILE, PRINT, OPTIONS, ZOOM and QUIT menus are working correctly is quite straightforward, and the detail of these tests is given later. 
+
+However, to test that the procedures for producing a graph, i.e. the commands contained in the GRAPH menu, are fully operational and contain no bugs is a much bigger task. 
+
+In particular, the testing of the parser is a daunting prospect.
+
+One of the principle features of the proposed system is the ability to enter a formula in any form which the user desires. 
+
+If the formula is mathematically correct, it will be interpreted and a graph produced. Clearly, it would be desirable to test every possible formula to make sure that the program produces the correct results. This is, however, impossible, as there are an almost infinite number of permissible formulae which may be input.
+
+This poses severe problems for the testing procedure. The only answer is to restrict the test data to formulae which represent the basic building blocks from which any formula is likely to be constructed.
+
+For example, the parser must be tested to make sure that it can cope with any type of operand, e.g. integers, floating-point numbers, negatives, x's etc..
+
+Also all the operators ( ^, *, /, +, - ) must work correctly, and the functions such as sin, cos, log etc. must produce the desired results.
+
+When the functioning of these basic operations has been verified, combinations can be tested.
+
+Obviously every possible combination cannot be checked. Assumptions will therefore have to be made. For example, if a test shows that the formula 'y=2*sinx' works, it will have to be assumed that 'y=2*cosx' works equally well, as it will have already been proved that the cos function works on its own, and that numbers and functions work together by the example 'y=2*sinx' above.
+
+To clarify this point, most of the test procedures will not be formulated with specific values or functions in mind, except when these are being individually tested. Instead, certain types of expression will be tested for. 
+
+For example, one test might be to make sure that negative integer left operands can be used with operators. When it has been proved that negative integer left operands work, and that all operators work, the specific operand and operator used in this test become irrelevant. 
+The test formula might be 'y=-3*6', but it could equally be 'y=–24^4'. Either way, if it works, it proves that negative integer left operands work with operators no matter what the operand or operator, because all the operands and operators have been previously tested individually.
+
+This process becomes clearer when the overall plan is made out.
+
+Obviously, with the system outlined above, there is a slight risk of an obscure bug passing through without detection. However, a completely secure testing algorithm could never be found to this type of program, and with this system of testing and close scrutiny of the (hopefully!) modular source code, the risk should be kept to a minimum.
+
+
+However, testing that correct formulae produce correct results is unfortunately only half the story. 
+
+This system permits any type of mathematically correct formula to be input. Unfortunately, there is likely to be at least ten incorrect formulae for every correct one. 
+
+Every one of these incorrect formulae must be detected and an appropriate error message displayed. If not, and an incorrect formula gets through, the dreaded system crash is the likely outcome.
+
+A similar method to that used previously is used to reduce the number of formulae to be tested.
+
+If a test formula such as 'y=3*6?' is used, and the program correctly detects that '?' is an invalid character, it will have to be assumed that all similar invalid characters will be detected. 
+
+Even with this type of assumption, there is still a large number of tests to be carried out. 
+
+What if the user tries to use a function or operator which does not exist, or by mistake types an invalid variable name? What if there are unequal numbers of left and right brackets? What if spaces are put into the formula, e.g. 'sin (x)' instead of 'sin(x)'. What if a mixture of lower case and upper case letters are used? 
+
+These examples are only some of the possible syntax errors which may occur.
+
+Then there are the mathematical errors. What if the user tries to calculate 'y=log(-1)', which is impossible, or 'y=3/x' where x has value 0 and thus division by zero is being attempted? What if the numbers to be calculated are too large for the computer to handle, e.g. 'y=sin(5^1000)'? The list goes on...
+
+
+Obviously, despite the assumption methods employed to reduce the number of tests, there is still a huge amount to be done. However, it has become manageable.
+
+I will now detail the tests to be carried out, starting with the simple ones which test the fundamental operation of the system. 
+
+Each test has a number (used during actual testing to identify it), along with its description and the expected result of the test.
+
+The tests will be carried out when the program is finished and the system up and running.
+
+The results of the tests can be found in the 'TESTING' section.
+FUNDAMENTAL OPERATIONS :
+
+
+Test 1      :  User inputs 'e','E', 'v' or 'V'  
+			(Hardware supports requested mode)
+Exp. result :  Program switches to requested mode, and 				displays menus.
+			
+Test 2 	  :  User inputs 'e','E','v' or 'V'
+			(Hardware does not support requested mode)
+Exp. result :  Suitable error message produced. Return to DOS.
+			
+Test 3      :  User inputs character not 'e','E','v', or 'V'.
+Exp. result :  Suitable error message produced, and user asked 			to try again.										
+Test 4      :  User loads program onto system with 
+			insufficient free memory.
+Exp. result :  Program displays error message and then 
+			terminates to DOS.
+			
+Test 5      :  User chooses menu using key, or by pressing 				mouse button while pointer is over menu 
+			heading.
+Exp. result :  Requested menu appears.
+			
+Test 6      :  User presses mouse button when pointer is not
+			over menu heading.
+Exp. result :  Nothing happens. 
+I will now deal with the processes which are called when the user picks any of the various options from each of the menus, starting with the FILE menu.
+
+
+FILE Menu
+
+Test 1      :  'Load' option picked from menu. (No graph
+			in memory which has not been saved)
+Exp. result :  Window appears, prompting user for name and
+			path of file to be loaded.
+			
+Test 2      :  'Load' option picked from menu. (Graph in 
+			memory which has not been saved)
+Exp. result :  Warning message appears. User asked whether he
+			wishes to continue 'Load' operation. If he 
+			replies 'Y' (for yes), 'Load' continues as in 
+			test 1, if 'N' (for no) he is returned to menu 
+			system. If other key is pressed, it is ignored.
+
+Test 3      :  'Load' option picked. User is asked for file 			name. Replies by pressing <return> key.
+Exp. result :  'Load' aborted. User returned to menu system.
+
+Test 4      :  'Load' option picked. User is asked for file 			name. Replies by typing 'a:\sine.gra', where 			file exists, and is not corrupt.
+Exp. result :  File loaded, and graph contained therein is 
+			displayed on-screen.
+Test 5      :  'Load' option picked. User is asked for file 			name. Replies by typing 'a:\cosine.gra', where 			file exists, but is corrupt.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is returned to menu system.
+
+Test 6      :  'Load' option picked. User is asked for file 			name. Replies by typing 'a:\tangent.gra', where 			file does not exist.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is returned to menu system.
+
+Test 7      :  'Load' option picked. User is asked for file
+			name. Replies by typing 'a:\sin.cos.gra', where
+			file name is not valid under MSDOS.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 8      :  'Load' option picked. User is asked for file
+			name. Replies by typing 'd:\sine.gra', where
+			'd' is not a valid drive.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 9      :  'Load' option picked. User is asked for file
+			name. Replies by typing 'a:\graph\sine.gra', 
+			where sub-directory 'graph' does not exist, 
+			i.e. path is invalid.
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+Test 10     :  'Save as...' option picked from menu. (Graph 
+			has been defined)
+Exp. result :  Window appears, summarising current graph
+			parameters. Then another window appears, 				prompting user to enter file and path name with 
+			which to save file.
+
+Test 11     :  'Save as...' option picked. (Graph has not yet 
+			been defined)
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 12     :  'Save as...' option picked. User is asked for
+			file name. Replies 'a:\sine.gra', where path is
+			valid, and file does not already exist.
+Exp. result :  File saved. Window appears informing user that
+			graph has been saved successfully, which 
+			disappears when user presses any key.
+
+Test 13     :  'Save as...' option picked. User is asked for
+			file name. Replies 'a:\cosine.gra', where file
+			already exists.
+Exp. result :  Window appears, warning user that if 'save'	
+			continues, existing file will be overwritten.
+			If user replies 'Y' (yes) to question 'Do you
+			still wish to save file?', file is saved, 
+			overwriting existing file. If user replies 'N'
+			(no), user returned to menu system. If any 
+			other key is pressed, it is ignored.
+Test 14     :  'Save as...' option picked. User is asked for 			file name. Replies by typing 'a:\sin.cos.gra', 			where file name is not valid under MSDOS.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 15     :  'Save as...' option picked. User is asked for
+			file name. Replies 'd:\sin.gra', where 'd' is
+			not a valid drive.
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+
+Test 16     :  'Save as...' option picked. User is asked for
+			file name. Replies 'a:\graph\sine.gra', where
+			'graph' directory does not exist, i.e. path
+			invalid. 
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+
+Test 17     :  'Save' option picked from menu, where previous
+			'Load' or 'Save as...' operation has taken 
+			place, and path referred to then is still 				valid.
+Exp. result :  File saved to disk. Window appears, confirming
+			this. When user presses any key, he is returned
+			to menu system.
+Test 18     :  'Save' option picked from menu, where previous
+			'Load' or 'Save as...' operation has taken 
+			place, but path referred to then is no longer
+			valid, e.g. floppy disk has been changed, and 
+			new one does not have the directory referred 
+			to.
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+
+Test 19     :  'Save' option picked from menu, where 'Load' or
+			'Save as...' operation has not taken place.
+Exp. result :  'Save as...' procedure invoked, i.e. user asked
+			for file name and path under which to save 
+			graph.
+
+
+PRINT Menu
+
+Test 1      :  'Print 24-pin' option picked from menu, where
+			graph has been defined, and printer is ready to
+			receive data.
+Exp. result :  Graph currently displayed on-screen is printed
+			out using 24-pin codes, at a resolution of 
+			360dpi, and vertical height dependant on screen
+			mode in use.
+
+Test 2      :  'Print 9-pin' option picked from menu, where
+			graph has been defined, and printer is ready to
+			receive data.
+Exp. result :  Graph currently displayed on-screen is printed
+			out using 9-pin codes, at a resolution of 
+			90dpi, and vertical height dependant on screen
+			mode in use.
+
+Test 3      :  Either of two print options picked, where graph 			has not yet been defined.
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+
+Test 4      :  Either of two print options picked, where graph 			has been defined, but printer is not ready. 				(e.g. printer switched off, not connected, or 			out of paper.)
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+OPTIONS Menu
+
+Test 1      :  'Speed' option picked from menu. 
+Exp. result :  Window displayed, asking user to enter new 
+			speed.
+
+Test 2      :  'Speed' option picked. User is asked to enter 			new speed. User types an integer between 1 and 
+			10.
+Exp. result :  Window disappears. Speed changed (for 					subsequent graphs) to value entered by user. 			User returned to menu system.
+
+Test 3      :  'Speed' option picked. User is asked to enter 
+			new speed. User types a number greater than 10.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is again asked to enter 
+			the new speed.
+
+Test 4      :  'Speed' option picked. User is asked to enter
+			new speed. User types a number less than 1.
+Exp. result :  Suitable error message displayed. When user
+			presses any key, he is again asked to enter the
+			new speed.
+
+Test 5      :  'Speed' option picked. User is asked to enter 
+			new speed. User types a floating-point number.
+Exp. result :  Window disappears. Speed changed (for 
+			subsequent graphs) to truncated value of number
+			entered by user. User returned to menu system.
+Test 6      :  'Speed' option picked. User is asked to enter
+			new speed. User types a character or string.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is again asked to enter the
+			new speed.
+
+Test 7 	  :  'Redraw' option picked from menu, where a graph
+			has previously been defined.
+Exp. result :  Graph is redrawn, using all the parameters 
+			including those such as speed which may have 			changed since the last graph was drawn.
+
+Test 8      :  'Redraw' option picked, where graph has not yet
+			been defined.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 9      :  'Radians' option picked from menu. (Only 				possible when degrees is currently in use.
+Exp. result :  Subsequent graphs are drawn using radian 
+			measure for angles.
+
+Test 10     :  'Degrees' option picked from menu. (Only 				possible when radians is currently in use)
+Exp. result :  Subsequent graphs are drawn using radian
+			measure for angles.
+
+Test 11     :  'Grid on' option picked from menu. (Only
+			possible when grid is currently off)
+Exp. result :  Subsequent graphs drawn with grid as back-
+			ground.
+
+Test 12     :  'Grid off' option picked from menu. (Only
+			possible when grid is currently on)
+Exp. result :  Subsequent graphs drawn with plain back-
+			ground, i.e. with no grid.
+
+
+ZOOM Menu
+
+
+Test 1      :  'Zoom in' option picked from menu, where a
+			mouse is installed, and a graph has been
+			defined.
+Exp. result :  Mouse pointer centred. User allowed to draw
+			rectangle with mouse. Area of graph defined
+			by rectangle is drawn full size on-screen.
+
+Test 2      :  'Zoom in' option picked, where mouse not
+			installed.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is returned to menu system.
+
+Test 3      :  'Zoom in' option picked, where mouse is 
+			installed, but no graph has been defined.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is returned to menu system.
+
+Test 4      :  'Zoom in' option picked, and user defines line
+			instead of rectangle. 
+Exp. result :  User returned to menu system.
+
+Test 5      :  'Zoom in' option picked, and user tries to pull
+			rectangle outside area of graph.
+Exp. result :  Rectangle only extends to extremes of drawing 			area.
+
+Test 6      :  'Zoom in' option picked, and user defines an
+			area too small to be drawn.
+Exp. result :  Suitable error message displayed. When user 
+			presses any key, he is returned to menu system.
+
+Test 7      :  'Zoom in' option picked, where user has already
+			zoomed in twenty times.
+Exp. result :  Warning message displayed, informing user that
+			any further zooms will not be recorded.
+
+Test 8      :  'Zoom out' option picked, where at least one
+			previous 'Zoom in' has taken place, and the
+			graph has not been altered since.
+Exp. result :  Previous graph, i.e. one before last zoom, is
+			drawn.
+
+Test 9      :  'Zoom out' option picked, where no previous 
+			'Zoom in' operations have taken place, or graph
+			has been changed since last 'Zoom in'.
+Exp. result :  Suitable error message displayed. When user 				presses any key, he is returned to menu system.
+
+Test 10     :  'Clear' option picked.
+Exp. result :  Acts as if no previous 'Zoom in' operations 
+			have taken place, i.e. no 'Zoom out' operations
+			until a 'Zoom in', and up to twenty 'Zoom in'
+			operations without warning.
+
+
+QUIT Menu 
+
+
+Test 1      :  'Sure - Yes' option picked from menu, and
+			either no graph is memory, or the graph in
+			memory has been saved.
+Exp. result :  Program terminates, and user returned to DOS
+			prompt.
+
+Test 2      :  'Sure - Yes' option picked, but graph in memory
+			which has not been saved.
+Exp. result :  Warning message produced. User informed that if
+			he quits now, the data in memory will be lost, 
+			and asked if he still wishes to quit. If he 
+			replies 'Y' (yes), program terminates and user
+			returned to DOS. If he replies 'N' (no), he is
+			returned to menu system. If any other key is 
+			pressed, it is ignored.
+
+Test 3      :  'No' option picked.
+Exp. result :  User to returned to menu system.
+
+
+GRAPH Menu (not including parser)
+
+Test 1      :  'New graph' option picked from menu.
+Exp. result :  Windows displayed, prompting user for formula 
+			and minimum and maximum x- and y-coordinates.
+
+Test 2      :  'New formula' option picked, where graph has 
+			already been defined.
+Exp. result :  Window appears, prompting user for new formula.
+
+Test 3      :  'New formula' option picked, where graph has 
+			not yet been defined.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 4      :  'New xy-axes' option picked, where graph has
+			already been defined.
+Exp. result :  Windows appear, prompting user for new minimum
+			and maximum x- and y-coordinates.
+
+Test 5      :  'New xy-axes' option picked, where graph has 
+			not yet been defined.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 6      :  'New x-axis' option picked, where graph has 
+			already been defined.
+Exp. result :  Window appears, prompting user for new minimum
+			and maximum x-coordinates.
+Test 7      :  'New x-axis' option picked, where graph has 
+			not yet been defined.
+Exp. result :  Suitable error message produced. When user 
+			presses any key, he is returned to menu system.
+
+Test 8      :  'New y-axis' option picked, where graph has
+			already been defined.
+Exp. result :  Window appears, prompting user for new minimum
+			and maximum y-coordinates.
+
+Test 9      :  'New y-axis' option picked, where graph has not
+			yet been defined.
+Exp. result :  Suitable error message produced. When user
+			presses any key, he is returned to menu system.
+
+Test 10     :  Any of the options involving the input of a set
+			of (either x or y) coordinates is picked. The 			coordinates are permissible.
+Exp. result :  Graph is immediately drawn using parameters 
+			currently stored in memory.
+
+Test 11     :  Any of the options involving the input of a set
+			of (either x or y) coordinates is picked. At 			least one of the coordinates is not a valid 				number, e.g. contains alphabetic characters.
+Exp. result :  Suitable error message is produced. When any
+			key is pressed by the user, he is asked to
+			re-enter the coordinates.
+
+Test 12     :  Any of the options involving the input of a set
+			of (either x or y) coordinates is picked. The 			coordinates encompass a range of values which 			is too small to be plotted.
+Exp. result :  Suitable error message is produced. When any
+			key is pressed by the user, he is asked to 
+			re-enter the coordinates.
+
+Test 13     :  Any of the options involving the input of a set 			of (either x or y) coordinates is picked. The 			minimum and maximum coordinates are equal.
+Exp. result :  Suitable error message is produced. When any 
+			key is pressed by the user, he is asked to
+			re-enter the coordinates.
+
+Test 14     :  Any of the options involving the input of a set
+			of (either x or y) coordinates is picked. The
+			minimum coordinate is bigger than the maximum
+			coordinate.
+Exp. result :  The values of the minimum and maximum 
+			coordinates are swapped, and the graph is then
+			drawn as normal.
+
+
+PARSER
+
+
+As already discussed, this is the difficult part of the testing procedure.
+
+After considerable deliberation, I have formulated a test plan which I believe to be the most efficient for the problem. 
+
+The testing algorithm I have in mind covers the huge number of possible formulae which may be entered by the user, without resorting to enormous numbers of test runs.
+
+
+The plan is in two sections. 
+
+The first part makes sure that the parser properly translates any correct formula which is input to the program.
+
+For example, if the user wants a graph of 'y=sin(x)', is this drawn correctly by the program? Similarly, every other type of correct formula must be verified.
+
+The second part ensures that the parser detects any incorrect formula which is input, and produces a suitable error message.
+
+For example, the user may mistype the formula, or be unsure about how to express a formula in the appropriate way.		 
+
+
+CORRECT FORMULAE
+
+
+This section is further divided into five different sub-sections. 
+
+The first sub-section is the major one. It ensures that the parser correctly deals with all the different types of operands, operators, and functions, and any combination of these basic building blocks.
+
+Obviously, these tests are fundamental to the operation of the program, and if the system does not pass them, it has failed miserably in its objectives.
+
+The second sub-section deals with priorities. Does the parser translate '3+4*5' as '(3+4)*5' or as '3+(4*5)'?
+
+The third sub-section makes sure that the parser correctly interprets parentheses.
+
+Finally, the fourth and fifth sub-sections ensure that implied multiplication operators and implied zeros are dealt with correctly.
+
+
+Operands, Operators, and Functions.
+
+
+There are five stages to this part of the test plan.
+
+
+   1. Check that all types of operand are correctly 
+	 translated.
+
+   2. Check that all of the operators are correctly 
+  	 translated.
+
+   3. Check that all of the functions are correctly 
+      translated.
+
+   4. Check that all types of operand work with all 
+	 of the operators.
+
+   5. Check that all types of operand work with all 
+	 of the functions.
+
+
+
+I will now expand on what I mean by the stages outlined above.
+
+
+Stage 1 : Operands
+
+
+There are essentially six types of operand which may be contained in a formula :
+
+	1)  positive integer
+	2)  negative integer
+	3)  positive floating-point number
+	4)  negative floating-point number
+	5)  positive x
+	6)  negative x
+
+All of these types must be tested.
+
+This is done by simply making a formula which contains solely each of the operands stated above. The exact value is largely irrelevant, as I will assume that if, for example, one positive integer works, any positive integer will work.
+
+The tests which I will make are therefore :
+
+	1)  y=2
+	2)  y=-640
+	3)  y=12.345
+	4)  y=-0.00043
+	5)  y=x
+	6)  y=-x
+
+Stage 2 : Operators
+
+
+There are five different operators available for use in a formula :
+
+	1)  ^  (power)
+	2)  *  (multiplication)
+	3)  /  (division)
+	4)  +  (addition)
+	5)  -  (subtraction)
+
+In this stage, all that is being tested is the ability of the parser to translate these operators. Therefore the operands which will be used in the tests are irrelevant. 
+
+For simplicity, I will use single-digit positive integers as operands. The tests are :
+
+
+	1)  y=3^2
+	2)  y=3*2
+	3)  y=3/2
+	4)  y=3+2
+	5)  y=3-2
+
+
+Stage 3 : Functions
+
+There are fourteen different functions which must be tested.
+
+	1)  sin     (sine)
+	2)  cos     (cosine)
+	3)  tan     (tangent)
+	4)  asin    (inverse sine)
+	5)  acos    (inverse cosine)
+	6)  atan    (inverse tangent)
+	7)  sinh    (hyperbolic sine)
+	8)  cosh    (hyperbolic cosine)
+	9)  tanh	  (hyperbolic tangent)
+    10)  log     (logarithm, base 10)
+    11)  ln      (logarithm, base e )
+    12)  exp     (e^x)
+    13)  sqrt    (square root)
+    14)  abs     (absolute or modulus)
+
+Once again, the operand used is irrelevant. I will use x.
+
+The tests are :
+
+	1)  y=sinx			8)  y=coshx
+	2)  y=cosx			9)  y=tanhx
+	3)  y=tanx		    10)  y=logx
+	4)  y=asinx		    11)  y=lnx
+	5)  y=acosx		    12)  y=expx
+	6)  y=atanx		    13)  y=sqrtx
+	7)  y=sinhx		    14)  y=absx
+Stage 4 : All Operands with Operators
+
+By this stage it has been proved that all of the operators work correctly with simple positive integer operands, e.g. 'y=3*2'. This shows that the operators are being detected correctly, and that they are subsequently being translated correctly.
+
+It has also been shown that all the different operands are being translated correctly, when specified without any operators, e.g. 'y=12.345'. 
+
+Therefore, as both operators and operands are being translated correctly, and operators are being detected correctly, it only remains to show that all the different operands are being detected correctly when put into an expression containing operators.
+
+This involves testing each type of operand in both the left and right side of an expression.
+
+The type of expression which is therefore going to be tested is :
+
+	1)  positive integer : operator : negative x
+	2)  negative integer : operator : positive x
+	3)  positive decimal : operator : negative decimal
+	4)  negative decimal : operator : positive decimal
+	5)  positive x       : operator : negative integer
+	6)  negative x       : operator : positive integer
+The operator for these expressions is irrelevant. I will use multiplication.
+
+The tests are :
+
+	1)  y=35*-x
+	2)  y=-2*x
+	3)  y=243.654*-0.654
+	4)  y=-9.546574*1.2
+	5)  y=x*-16
+	6)  y=-x*3
+
+
+
+Stage 5 : All Operands with Functions
+
+This stage checks that the parser can cope with any type of operand present within a function, and similar reasoning to that of stage 4 is used to justify the choice of test data.
+
+The tests take the form :
+
+	1)  function : positive integer
+	2)  function : negative integer
+	3)  function : positive floating-point
+	4)  function : negative floating-point
+	5)  function : positive x
+	6)  function : negative x
+
+The function used is irrelevant. I will use 'sin'.
+
+The tests are :
+
+	1)  sin(45)     	(degrees)
+	2)  sin(-4)     	(radians)
+	3)  sin(5.897)      (radians)
+	4)  sin(-287.98)    (degrees)
+	5)  sin(x)		(degrees)
+	6)  sin(-x)		(radians)
+
+(The brackets are only necessary for the expressions containing negative operands, but are included in all of them for clarity.)
+
+
+This concludes the 'Operands, Operators and Functions' sub-section of the testing.
+
+
+Priorities
+
+Obviously the parser must be able to translate formulae using the correct priorities for the various operators.
+
+The priorities should be :
+
+	First  :  '^' (power)
+	Second :  '*' (multiplication) and '/' (division)
+	Third  :  '+' (addition) and '-' (subtraction)
+
+When priorities of two operators are the same, they should be evaluated from left to right.
+
+To test priorities, I will use only one test formula.
+
+The formula is :
+
+	y=3+4*6^2/8-5
+
+This formula was chosen as it contains every operator, and also because it will only be evaluated to the correct answer if the priorities are translated properly. This is actually proved by the 'Parentheses' sub-section which follows.
+
+The correct answer is 16, and is found if the formula is translated by the parser as :
+
+	y=3+(4*(6^2)/8)-5
+Parentheses 
+
+Parentheses, or brackets, are used to alter the standard priorities of a formula.
+
+To test that the parser deals with parentheses correctly, I will verify my statement in the previous sub-section, i.e. that the formula y=3+4*6^2/8-5 produces different answers depending on the priorities associated with each part of it.
+
+The formulae below show each way that the priorities of the original formula can be manipulated using one set of brackets, and the corresponding result that the program should produce for each one.
+
+	1)  y=(3+4)*6^2/8-5       (26.5)
+	2)  y=3+(4*6)^2/8-5       (70)
+	3)  y=3+4*6^(2/8)-5		 (4.260)
+	4)  y=3+4*6^2/(8-5)		 (51)
+	5)  y=(3+4*6)^2/8-5		 (86.125)
+	6)  y=3+4*6^(2/8-5)		 (3.000)
+	7)  y=(3+4*6^2)/8-5		 (13.375)
+	8)  y=3+4*(6^2/8-5)		 (1)
+	
+
+This shows fairly comprehensively whether or not the parser is translating brackets correctly.
+
+All that remains is to make sure that it can deal with sets of nested brackets. Once again the formula y=3+4*6^2/8-5 will be
+used.
+
+	9)  Two sets :  y=(3+(4*6)^2/8)-5			(70)
+	10) Three    :  y=(3+(4*6^(2/8))-5)		(4.260)
+	11) Four     :  y=(3+(4*6^(2/(8-5))))		(16.208)
+	12) Five	   :  y=(3+(4*(6^(2/8)-(5))))	     (-10.740)
+	13) Six      :  y=((z(3+4)*6)^((2/(8-5))))    (12.083)
+
+I will assume that if the parser is capable of dealing with six levels of nested parentheses, it will be able to cope with any variation of correctly defined brackets that the user is likely to supply.
+
+
+Implied Multiplication
+
+The parser supports the use of the implied multiplication sign. This is used extensively when writing down mathematical formulae. 
+
+For example, it is much more common to see 'y=3(x+2)' than 'y=3*(x+2)'. In the first formula, there is a multiplication sign implied between the 3 and the left bracket.
+
+There are several types of expression in which an implied multiplication might occur.
+
+The tests are :
+
+
+	1)  number   : x
+	2)  number   : function
+	3)  number   : bracket
+	4)  x        : function
+	5)  x        : bracket
+	6)  function : bracket
+	7)  function : function
+	8)  bracket  : bracket
+
+
+In each case above, the actual number or function used is irrelevant. I have used a variety of different types.
+
+
+	1)  y=3x
+	2)  y=-2.6expx
+	3)  y=4.2(x+2)
+	4)  y=xabsx
+	5)  y=x(2-x)
+	6)  y=logx(x/2)
+	7)  y=sinxcosx
+	8)  (x+2)(x-3)
+
+
+Implied Zero
+
+
+This is the final area of testing of correct formulae, and is very simple.
+
+Implied zero occurs when the user has left out the zero which is usually present in front of the decimal point in a number less than 1.
+
+For example, the user might type 'y=.5x' instead of 'y=0.5x'.
+
+The implied zero can only occur in two places, i.e. in a left or right operand.
+
+Thus the only test which needs to be done is of the form :
+
+number with implied zero : operator : number with implied zero
+
+I have chosen the formula 
+
+		y=.54*.32
+
+
+This formula concludes the testing of correct formulae which the user could possibly type in.
+
+
+INCORRECT FORMULAE
+
+
+These formulae make up the second section of testing of the parser.
+
+Formulae which contain errors can be divided into two sections.
+
+The first type are those which contain syntax errors. For example, the user might have typed a function name incorrectly, or left out a bracket. These errors are detected before the plotting of the graph is attempted, and the user should be asked to re-enter the formula. 
+
+The second type are those which contain mathematical errors. For example, the formula might have the expression '1/x' in it, which could not be evaluated when x is zero. Presumably these type of errors will only be discovered when the graph plotting process has already been started. In this case, the user should be given the choice of either continuing the graph (ignoring the point which cannot be plotted), or terminating the graph. 
+
+Either way, the important thing is that the errors are detected in the first place, and the user informed of the problem.
+
+
+Syntax
+
+
+There are several different types of syntax errors which may occur :
+
+	1)  invalid character in formula.
+	2)  invalid function name in formula.
+	3)  upper case letters, or a combination of upper and
+	    lower case letters used in formula.
+	4)  unbalanced brackets, i.e. more left brackets than
+	    right brackets or vice versa.
+	5)  formula starting with variable other than 'y'.
+	6)  formula containing variable other than 'x'.
+	7)  two or more adjacent decimal points.
+
+
+The examples formulae which I will use to test each of these conditions are :
+
+	1)  y=3&2
+	2)  y=2*fred(x)
+	3)  Y=24+Cos(x)
+	4)  y=4+(2/(3+5)
+	5)  t=2x
+	6)  y=16b+2
+	7)  y=x+2..4*6
+
+
+Mathematical
+ 
+
+These errors all occur because of inappropriate operands being used in expressions contained in the formula.
+
+If these operands appear as actual values in the formula, e.g. 'y=3/0', it is obvious that no points will be able to be plotted.
+
+However, if the operands appear as variations of x, e.g. 'y=1/x', some of the graph may be drawn before an error occurs.
+
+
+The tests are :
+
+	1)  Division by zero.
+	2)  Taking a fractional power of a negative number.
+	3)  Taking the zeroth or negative power of zero.
+	4)  Taking the tangent of a multiple of 180, start-
+	    point 90, in degrees, i.e. tangent of ...., -90, 90, 
+	    270, ...
+	    (Program would not be accurate enough to cause an
+	    error in radians).
+	5)  Inverse sine of number outside range -1 to 1.
+	6)  Inverse cosine of number outside range -1 to 1.
+	7)  logarithm (to either base) of number less than
+	    or equal to zero.
+	8)  square root of negative number.
+	9)  loss of significance, i.e. using a function with an
+	    operand which can be calculated on its own, but which
+	    is too big or small to be handled by the function.
+    10)  overflow, i.e. using a number too big for the program
+	    to handle.
+    11)  underflow, i.e. using a number too small for the 
+	    program to handle.
+
+The formulae which I have chosen to test these situations 
+are :
+
+	1)  y=4/0
+	2)  y=-2^(1/2)
+	3)  y=0^0  and  y=0^-2.4
+	4)  y=tan(270)
+	5)  y=asin(-2.3)  and  y=asin(60)
+	6)  y=acos(-1.0001)  and  y=acos(5)
+	7)  y=log(0)  and  y=ln(-23.4)
+	8)  y=sqrt(-3)
+	9)  y=sin(10^60)
+    10)  y=3.4^10000
+    11)  y=29.3^-10000
+
+This concludes the test for errors in the formula, and therefore completes the test plan.
+
+The results of these tests can be found in the 'TESTING' section.
